@@ -49,7 +49,7 @@ export default function Standings() {
             {standings.map(t => {
               const isMyTeam = t.id === team.id;
               const pct = t.w + t.l > 0 ? (t.w / (t.w + t.l)).toFixed(3) : '.000';
-              const inPlayoffs = t.rank <= (conf === 'All' ? 16 : 8);
+            
               return (
                 <tr key={t.id} style={isMyTeam ? { background: 'rgba(232,255,71,0.08)', outline: '1px solid var(--accent)', outlineOffset: '-1px' } : {}}>
                   <td className="mono muted" style={{ fontSize: 13 }}>
