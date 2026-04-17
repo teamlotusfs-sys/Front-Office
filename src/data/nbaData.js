@@ -32,11 +32,10 @@ export const NBA_TEAMS = [
 ];
 
 const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
-const firstNames = ['James', 'Anthony', 'Kevin', 'Jayson', 'Luka', 'Shai', 'Tyrese', 'Ja', 'Devin', 'Donovan', 'Trae', 'LaMelo', 'Paolo', 'Chet', 'Victor', 'Franz', 'Evan', 'Jordan', 'Marcus', 'Kyle', 'Darius', 'Jalen', 'Scottie', 'RJ', 'Miles', 'Coby', 'Cam', 'Brandon', 'Immanuel', 'Dyson'];
-const lastNames = ['Johnson', 'Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodriguez', 'Lewis', 'Lee', 'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez'];
+const firstNames = ['James', 'Anthony', 'Kevin', 'Jayson', 'Luka', 'Shai', 'Tyrese', 'Ja', 'Devin', 'Donovan', 'Trae', 'LaMelo', 'Paolo', 'Chet', 'Victor', 'Franz', 'Evan', 'Jordan', 'Marcus', 'Kyle', 'Kyrie', 'Damian', 'Brandon', 'De\'Aaron', 'Tyson', 'Chris', 'Kawhi', 'Jimmy', 'Paul', 'LeBron', 'Giannis', 'Nikola', 'Lol', 'Rui', 'OG', 'Robert', 'Scottie', 'Paolo', 'Paolo', 'Desmond', 'Keldon', 'Cole', 'Jalen', 'Austin', 'Alperen', 'Tari', 'Precious', 'Ayo', 'Darius', 'Herbert', 'Jalen', 'Jalen', 'Tre', 'Keegan', 'Bennedict', 'Jaime', 'Stanley', 'Oscar', 'Tre', 'Killian', 'Max', 'Leaky', 'Lamar', 'Isaiah', 'Aaron', 'Jalen', 'Charles', 'Bones', 'Osan', 'Saddiq', 'Isaiah', 'Isaiah', 'Bobby', 'Harrison', 'Malik', 'Juan', 'Trey', 'Kostas', 'Daniel', 'Isaiah', 'Isaiah', 'Lonnie', 'Chris', 'Moses', 'Javon', 'Jae', 'Derrick', 'Oshae', 'Joe', 'AJ'];
+const lastNames = ['Johnson', 'Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodriguez', 'Lewis', 'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams', 'Nelson', 'Carter', 'Roberts', 'Phillips', 'Campbell', 'Parker', 'Evans', 'Edwards', 'Collins', 'Reeves', 'Stewart', 'Sengun', 'Eze', 'Achiuwa', 'Dosunmu', 'Sabonis', 'Jones Jr', 'Adebayo', 'Jones', 'Brunson', 'Holiday', 'Smart', 'Allen', 'Claxton', 'Tatum', 'Brown', 'Doncic', 'Irving', 'Hardaway', 'Jokic', 'Murray', 'Nurkic', 'Holiday', 'Leonard', 'George'];
 
 let playerIdCounter = 1;
-
 
 function random() {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
@@ -54,8 +53,28 @@ function random() {
 export function generatePlayer(teamId, overrides = {}) {
   const pos = positions[Math.floor(random() * positions.length)];
   const age = 19 + Math.floor(random() * 16);
-  const ovr = Math.max(60, Math.min(99, Math.floor(random() * 35) + 62));
-  const pot = Math.min(99, ovr + Math.floor(random() * 20));
+  
+  // More realistic overall generation
+  // Most players 60-75, some 75-82, rare 82+
+  let ovr;
+  const rand = random();
+  if (rand < 0.7) {
+    // 70% of players: 58-74
+    ovr = 58 + Math.floor(random() * 17);
+  } else if (rand < 0.95) {
+    // 25% of players: 74-82
+    ovr = 74 + Math.floor(random() * 8);
+  } else {
+    // 5% of players: 82-88 (super rare elite players)
+    ovr = 82 + Math.floor(random() * 6);
+  }
+  
+  // Cap free agents at 82 overall max
+  if (!teamId && ovr > 82) {
+    ovr = 82;
+  }
+  
+  const pot = Math.min(99, ovr + Math.floor(random() * 15));
   const salary = Math.round((ovr - 60) * 0.8 + random() * 5 + 1) * 1_000_000;
   const yearsLeft = 1 + Math.floor(random() * 4);
 
