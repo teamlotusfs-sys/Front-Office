@@ -3,6 +3,19 @@ import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, genera
 
 const GameContext = createContext(null);
 
+function random() {
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    return arr[0] / 4294967296;
+  }
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    const hex = crypto.randomUUID().replace(/-/g, '').slice(0, 8);
+    return parseInt(hex, 16) / 4294967296;
+  }
+  throw new Error('Secure randomness is unavailable in this environment.');
+}
+
 export function GameProvider({ children }) {
   const [gameState, setGameState] = useState(null);
 
@@ -74,9 +87,9 @@ export function GameProvider({ children }) {
       if (!prev) return prev;
       const nextGame = prev.schedule.find(g => !g.played);
       if (!nextGame) return prev;
-      const won = Math.random() > 0.5;
-      const score = { us: won ? 108 + Math.floor(Math.random() * 15) : 95 + Math.floor(Math.random() * 15), them: 0 };
-      score.them = won ? score.us - 5 - Math.floor(Math.random() * 15) : score.us + 5 + Math.floor(Math.random() * 15);
+      const won = random() > 0.5;
+      const score = { us: won ? 108 + Math.floor(random() * 15) : 95 + Math.floor(random() * 15), them: 0 };
+      score.them = won ? score.us - 5 - Math.floor(random() * 15) : score.us + 5 + Math.floor(random() * 15);
       const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
       const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
       return {

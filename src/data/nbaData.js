@@ -44,7 +44,11 @@ function random() {
     crypto.getRandomValues(arr);
     return arr[0] / 4294967296;
   }
-  return (Date.now() % 1000) / 1000;
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    const hex = crypto.randomUUID().replace(/-/g, '').slice(0, 8);
+    return parseInt(hex, 16) / 4294967296;
+  }
+  throw new Error('Secure randomness is unavailable in this environment.');
 }
 
 export function generatePlayer(teamId, overrides = {}) {
