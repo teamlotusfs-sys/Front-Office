@@ -153,7 +153,7 @@ export default function PhonePopup({ offer, onAnswer, onDecline }) {
           }}>
             <div>GM wants to discuss a trade</div>
             <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
-              {trade.yourPlayers?.length} player{trade.yourPlayers?.length !== 1 ? 's' : ''} for {trade.theirPlayers?.length}
+              {offer.yourPlayers?.length} player{offer.yourPlayers?.length !== 1 ? 's' : ''} for {offer.theirPlayers?.length}
             </div>
           </div>
 
