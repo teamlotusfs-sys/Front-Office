@@ -4,15 +4,40 @@ import { NBA_TEAMS } from '../data/nbaData';
 
 export default function Standings() {
   const { gameState } = useGame();
-  const { team, wins, losses } = gameState;
+  const { team, wins, losses, schedule, allRosters } = gameState;
   const [conf, setConf] = useState('All');
 
-  // Build standings with our real record injected
-  const allStandings = NBA_TEAMS.map(t => {
-    const [w, l] = t.record.split('-').map(Number);
-    if (t.id === team.id) return { ...t, w: wins, l: losses };
-    return { ...t, w, l };
+  // Calculate wins/losses for all teams from their rosters in schedule
+  const teamRecords = {};
+  NBA_TEAMS.forEach(t => {
+    teamRecords[t.id] = { w: 0, l: 0 };
   });
+
+  // Count played games
+  schedule.forEach(g => {
+    const opponent = NBA_TEAMS.find(t => t.abbr === g.opponent);
+    if (g.played && opponent) {
+      if (g.won) {
+        // Your team won
+        teamRecords[team.id].w++;
+        teamRecords[opponent.id].l++;
+      } else {
+        // Your team lost
+        teamRecords[team.id].l++;
+        teamRecords[opponent.id].w++;
+      }
+    }
+  });
+
+  // Override your team with actual state
+  teamRecords[team.id] = { w: wins, l: losses };
+
+  // Build standings
+  const allStandings = NBA_TEAMS.map(t => ({
+    ...t,
+    w: teamRecords[t.id].w,
+    l: teamRecords[t.id].l,
+  }));
 
   // Filter by conference
   const filtered = allStandings.filter(t => conf === 'All' || t.conf === conf);
