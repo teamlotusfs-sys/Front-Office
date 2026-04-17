@@ -1,125 +1,282 @@
 import React, { useState } from 'react';
-import { useGame, formatSalary, ovrColor } from '../hooks/useGameState';
+import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
+import { evaluateTrade, calculateTradeValue } from '../data/TradeSystem';
+import TradeConversation from './TradeConversation';
+import PhonePopup from '../components/PhonePopup';
 
 export default function Trades() {
-  const { gameState } = useGame();
-  const { roster, allRosters } = gameState;
+  const { gameState, executeTrade, declineTrade } = useGame();
+  const { roster, team, allRosters } = gameState;
+  const [activeTab, setActiveTab] = useState('propose'); // propose | offers | history
   const [selectedTeam, setSelectedTeam] = useState(null);
-  const [mySelected, setMySelected] = useState([]);
-  const [theirSelected, setTheirSelected] = useState([]);
+  const [selectedYourPlayers, setSelectedYourPlayers] = useState([]);
+  const [selectedTheirPlayers, setSelectedTheirPlayers] = useState([]);
+  const [tradeEval, setTradeEval] = useState(null);
+  const [activeConversation, setActiveConversation] = useState(null);
+  const [answeringPhone, setAnsweringPhone] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const otherTeams = NBA_TEAMS.filter(t => t.id !== gameState.team.id);
-  const theirRoster = selectedTeam ? (allRosters[selectedTeam.id] || []) : [];
+  const availableTeams = NBA_TEAMS.filter(t => t.id !== team.id);
 
-  function toggleMine(id) {
-    setMySelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  }
-  function toggleTheirs(id) {
-    setTheirSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  }
+  const handleProposeTradeClick = () => {
+    if (!selectedTeam || selectedYourPlayers.length === 0 || selectedTheirPlayers.length === 0) {
+      return;
+    }
 
-  const mySalary = mySelected.reduce((s, id) => s + (roster.find(p => p.id === id)?.salary || 0), 0);
-  const theirSalary = theirSelected.reduce((s, id) => s + (theirRoster.find(p => p.id === id)?.salary || 0), 0);
-  const canPropose = mySelected.length > 0 && theirSelected.length > 0;
+    const yourPlayers = roster.filter(p => selectedYourPlayers.includes(p.id));
+    const theirPlayers = allRosters[selectedTeam.id].filter(p => selectedTheirPlayers.includes(p.id));
+
+    const evaluation = evaluateTrade(yourPlayers, [], theirPlayers, [], selectedTeam.id);
+    
+    setTradeEval({
+      from: selectedTeam,
+      yourPlayers,
+      theirPlayers,
+      picks: [],
+      ...evaluation,
+    });
+
+    setActiveConversation({
+      from: selectedTeam,
+      yourPlayers,
+      theirPlayers,
+      message: evaluation.message,
+      type: evaluation.type,
+      accepted: evaluation.accepted,
+      countered: evaluation.countered,
+    });
+  };
+
+  const handleAcceptTrade = (trade) => {
+    executeTrade(trade);
+    setActiveConversation(null);
+    setSelectedYourPlayers([]);
+    setSelectedTheirPlayers([]);
+    setSelectedTeam(null);
+  };
+
+  const handleDeclineTrade = (trade) => {
+    declineTrade(trade);
+    setActiveConversation(null);
+  };
+
+  const filteredTeams = availableTeams.filter(t =>
+    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.abbr.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const proposeTab = (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+      {/* Team Select */}
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
+          Trade Partner
+        </div>
+        <input
+          placeholder="Search teams..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '8px 12px',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border)',
+            borderRadius: 6,
+            color: 'var(--text-primary)',
+            fontSize: 12,
+            marginBottom: 10,
+            outline: 'none',
+          }}
+        />
+        <div style={{ maxHeight: 400, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {filteredTeams.map(t => (
+            <button
+              key={t.id}
+              onClick={() => setSelectedTeam(t)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '10px 12px',
+                background: selectedTeam?.id === t.id ? 'var(--accent-dim)' : 'var(--bg-card)',
+                border: selectedTeam?.id === t.id ? '1px solid var(--accent)' : '1px solid var(--border)',
+                borderRadius: 6,
+                color: 'var(--text-primary)',
+                fontSize: 12,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                textAlign: 'left',
+              }}
+            >
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: t.color, flexShrink: 0 }} />
+              <span>{t.abbr}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Your Players */}
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
+          Your Players ({selectedYourPlayers.length})
+        </div>
+        <div style={{ maxHeight: 400, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {roster.map(p => (
+            <button
+              key={p.id}
+              onClick={() => setSelectedYourPlayers(prev =>
+                prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
+              )}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '10px 12px',
+                background: selectedYourPlayers.includes(p.id) ? 'var(--accent-dim)' : 'var(--bg-card)',
+                border: selectedYourPlayers.includes(p.id) ? '1px solid var(--accent)' : '1px solid var(--border)',
+                borderRadius: 6,
+                color: 'var(--text-primary)',
+                fontSize: 12,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                textAlign: 'left',
+              }}
+            >
+              <span>{p.firstName} {p.lastName}</span>
+              <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{p.ovr}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Their Players */}
+      <div>
+        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, textTransform: 'uppercase', color: 'var(--text-secondary)' }}>
+          Their Players ({selectedTheirPlayers.length})
+        </div>
+        <div style={{ maxHeight: 400, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {selectedTeam && allRosters[selectedTeam.id] ? (
+            allRosters[selectedTeam.id].map(p => (
+              <button
+                key={p.id}
+                onClick={() => setSelectedTheirPlayers(prev =>
+                  prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                )}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '10px 12px',
+                  background: selectedTheirPlayers.includes(p.id) ? 'var(--accent-dim)' : 'var(--bg-card)',
+                  border: selectedTheirPlayers.includes(p.id) ? '1px solid var(--accent)' : '1px solid var(--border)',
+                  borderRadius: 6,
+                  color: 'var(--text-primary)',
+                  fontSize: 12,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  textAlign: 'left',
+                }}
+              >
+                <span>{p.firstName} {p.lastName}</span>
+                <span style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{p.ovr}</span>
+              </button>
+            ))
+          ) : (
+            <div style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Select a team first</div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div>
       <h1 className="page-title">Trade Center</h1>
-      <p className="page-subtitle">Select a team, pick players from both sides, and propose a trade.</p>
+      <p className="page-subtitle">Propose trades, receive offers, negotiate deals</p>
 
-      <div style={{ display: 'flex', gap: 20, marginBottom: 20 }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 11, color: 'var(--text-secondary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 8 }}>Trade With</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(90px, 1fr))', gap: 6, maxHeight: 220, overflowY: 'auto' }}>
-            {otherTeams.map(t => (
-              <button key={t.id} onClick={() => { setSelectedTeam(t); setTheirSelected([]); }}
-                style={{ background: selectedTeam?.id === t.id ? 'var(--accent-dim)' : 'var(--bg-card)', border: `1px solid ${selectedTeam?.id === t.id ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 6, padding: '8px 6px', cursor: 'pointer', transition: 'all 0.12s' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: t.color, margin: '0 auto 4px' }} />
-                <div style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 16, letterSpacing: '0.04em', color: selectedTeam?.id === t.id ? 'var(--accent)' : 'var(--text-primary)' }}>{t.abbr}</div>
-              </button>
-            ))}
+      {/* Tabs */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
+        {[
+          { id: 'propose', label: '✉️ Propose Trade' },
+          { id: 'offers', label: '📞 Trade Offers' },
+          { id: 'history', label: '📋 History' },
+        ].map(t => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            style={{
+              background: activeTab === t.id ? 'var(--accent-dim)' : 'var(--bg-card)',
+              border: `1px solid ${activeTab === t.id ? 'var(--accent)' : 'var(--border)'}`,
+              borderRadius: 4,
+              color: activeTab === t.id ? 'var(--accent)' : 'var(--text-secondary)',
+              padding: '8px 16px',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div style={{ display: activeTab === 'propose' ? 'block' : 'none' }}>
+        {activeConversation ? (
+          <div style={{ maxWidth: 600 }}>
+            <TradeConversation
+              trade={activeConversation}
+              onAccept={handleAcceptTrade}
+              onDecline={handleDeclineTrade}
+              isIncoming={false}
+            />
           </div>
+        ) : (
+          <>
+            {proposeTab}
+            <button
+              onClick={handleProposeTradeClick}
+              disabled={!selectedTeam || selectedYourPlayers.length === 0 || selectedTheirPlayers.length === 0}
+              style={{
+                marginTop: 20,
+                padding: '12px 24px',
+                background: selectedTeam && selectedYourPlayers.length > 0 && selectedTheirPlayers.length > 0 ? 'var(--accent)' : 'var(--bg-hover)',
+                color: selectedTeam && selectedYourPlayers.length > 0 && selectedTheirPlayers.length > 0 ? '#0a0a0f' : 'var(--text-secondary)',
+                border: 'none',
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: selectedTeam && selectedYourPlayers.length > 0 && selectedTheirPlayers.length > 0 ? 'pointer' : 'not-allowed',
+                transition: 'all 0.15s',
+              }}
+            >
+              Send Trade Offer
+            </button>
+          </>
+        )}
+      </div>
+
+      <div style={{ display: activeTab === 'offers' ? 'block' : 'none' }}>
+        <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px 20px' }}>
+          No trade offers yet. GMs will call you with offers during the season.
         </div>
       </div>
 
-      {selectedTeam && (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 20, alignItems: 'flex-start' }}>
-            {/* My side */}
-            <div className="table-wrap">
-              <div className="table-header">
-                <span className="table-title">Your Players</span>
-                <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{mySelected.length} selected · {formatSalary(mySalary)}</span>
-              </div>
-              <table>
-                <thead><tr><th>✓</th><th>Player</th><th>Pos</th><th>OVR</th><th>Salary</th></tr></thead>
-                <tbody>
-                  {roster.map(p => (
-                    <tr key={p.id} onClick={() => toggleMine(p.id)} style={{ cursor: 'pointer', background: mySelected.includes(p.id) ? 'rgba(232,255,71,0.07)' : '' }}>
-                      <td><input type="checkbox" checked={mySelected.includes(p.id)} onChange={() => toggleMine(p.id)} style={{ cursor: 'pointer' }} /></td>
-                      <td style={{ fontWeight: 500, fontSize: 13 }}>{p.firstName} {p.lastName}</td>
-                      <td><span className="badge badge-muted">{p.pos}</span></td>
-                      <td style={{ color: ovrColor(p.ovr), fontFamily: 'DM Mono, monospace', fontWeight: 700 }}>{p.ovr}</td>
-                      <td className="mono" style={{ fontSize: 12 }}>{formatSalary(p.salary)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Arrow */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, paddingTop: 80 }}>
-              <span style={{ fontSize: 28, opacity: 0.4 }}>⇄</span>
-              <button
-                className="action-btn success"
-                disabled={!canPropose}
-                onClick={() => alert('Trade logic coming soon! You can wire this up to your game state.')}
-                style={{ fontSize: 13, padding: '10px 16px', opacity: canPropose ? 1 : 0.4 }}
-              >
-                Propose
-              </button>
-              {canPropose && (
-                <div style={{ fontSize: 11, color: 'var(--text-secondary)', textAlign: 'center', lineHeight: 1.5 }}>
-                  <div>You send: {formatSalary(mySalary)}</div>
-                  <div>They send: {formatSalary(theirSalary)}</div>
-                  <div style={{ color: Math.abs(mySalary - theirSalary) < 5_000_000 ? 'var(--green)' : 'var(--orange)', marginTop: 4 }}>
-                    {Math.abs(mySalary - theirSalary) < 5_000_000 ? '✓ Balanced' : '⚠ Imbalanced'}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Their side */}
-            <div className="table-wrap">
-              <div className="table-header">
-                <span className="table-title">{selectedTeam.name}</span>
-                <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>{theirSelected.length} selected · {formatSalary(theirSalary)}</span>
-              </div>
-              <table>
-                <thead><tr><th>✓</th><th>Player</th><th>Pos</th><th>OVR</th><th>Salary</th></tr></thead>
-                <tbody>
-                  {theirRoster.map(p => (
-                    <tr key={p.id} onClick={() => toggleTheirs(p.id)} style={{ cursor: 'pointer', background: theirSelected.includes(p.id) ? 'rgba(232,255,71,0.07)' : '' }}>
-                      <td><input type="checkbox" checked={theirSelected.includes(p.id)} onChange={() => toggleTheirs(p.id)} style={{ cursor: 'pointer' }} /></td>
-                      <td style={{ fontWeight: 500, fontSize: 13 }}>{p.firstName} {p.lastName}</td>
-                      <td><span className="badge badge-muted">{p.pos}</span></td>
-                      <td style={{ color: ovrColor(p.ovr), fontFamily: 'DM Mono, monospace', fontWeight: 700 }}>{p.ovr}</td>
-                      <td className="mono" style={{ fontSize: 12 }}>{formatSalary(p.salary)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
-
-      {!selectedTeam && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-secondary)' }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>🔄</div>
-          <p>Select a team above to start building a trade.</p>
+      <div style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
+        <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px 20px' }}>
+          No trades completed yet.
         </div>
+      </div>
+
+      {/* Phone Popup */}
+      {answeringPhone && (
+        <PhonePopup
+          offer={answeringPhone}
+          onAnswer={() => setActiveConversation(answeringPhone)}
+          onDecline={() => setAnsweringPhone(null)}
+        />
       )}
     </div>
   );
