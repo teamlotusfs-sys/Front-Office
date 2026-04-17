@@ -110,14 +110,9 @@ export function GameProvider({ children }) {
       const yourTeam = prev.team;
       const opponent = NBA_TEAMS.find(t => t.abbr === nextGame.opponent);
       
-      // Win probability based on team ratings
-      const yourRating = yourTeam.rating;
-      const oppRating = opponent.rating;
-      const ratingDiff = yourRating - oppRating;
-      
       // Home court advantage: +3 rating points
-      const adjustedRating = yourRating + (nextGame.isHome ? 3 : -3);
-      const adjustedOppRating = oppRating - (nextGame.isHome ? 3 : -3);
+      const adjustedRating = yourTeam.rating + (nextGame.isHome ? 3 : -3);
+      const adjustedOppRating = opponent.rating - (nextGame.isHome ? 3 : -3);
       
       // Calculate win probability
       const totalRating = adjustedRating + adjustedOppRating;
