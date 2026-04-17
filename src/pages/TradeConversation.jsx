@@ -17,8 +17,11 @@ export default function TradeConversation({
   ]);
   
   const team = NBA_TEAMS.find(t => t.id === trade.from.id);
+  const isDeclined = trade.type === 'decline';
 
   const handleAccept = () => {
+    if (isDeclined) return; // Block if declined
+    
     setMessages([...messages, {
       from: 'you',
       text: '✓ Trade Accepted',
@@ -142,11 +145,13 @@ export default function TradeConversation({
         padding: '12px 16px',
         borderTop: '1px solid var(--border)',
         background: 'var(--bg-surface)',
+        flexWrap: 'wrap',
       }}>
         <button
           onClick={handleDecline}
           style={{
             flex: 1,
+            minWidth: 80,
             padding: '8px 12px',
             background: 'var(--bg-hover)',
             border: '1px solid var(--border)',
@@ -173,6 +178,7 @@ export default function TradeConversation({
             onClick={handleCounter}
             style={{
               flex: 1,
+              minWidth: 80,
               padding: '8px 12px',
               background: 'var(--bg-hover)',
               border: '1px solid var(--accent)',
@@ -195,28 +201,51 @@ export default function TradeConversation({
         )}
         <button
           onClick={handleAccept}
+          disabled={isDeclined}
           style={{
             flex: 1,
+            minWidth: 80,
             padding: '8px 12px',
-            background: 'var(--accent)',
+            background: isDeclined ? 'var(--bg-hover)' : 'var(--accent)',
             border: 'none',
             borderRadius: 4,
-            color: '#0a0a0f',
+            color: isDeclined ? 'var(--text-secondary)' : '#0a0a0f',
             fontSize: 11,
             fontWeight: 600,
-            cursor: 'pointer',
+            cursor: isDeclined ? 'not-allowed' : 'pointer',
             transition: 'all 0.15s',
+            opacity: isDeclined ? 0.5 : 1,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-1px)';
+            if (!isDeclined) {
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
+            if (!isDeclined) {
+              e.currentTarget.style.transform = 'translateY(0)';
+            }
           }}
+          title={isDeclined ? 'Trade declined - cannot accept' : 'Accept trade'}
         >
           Accept
         </button>
       </div>
+
+      {/* Declined Message */}
+      {isDeclined && (
+        <div style={{
+          padding: '12px 16px',
+          background: 'rgba(255, 71, 87, 0.1)',
+          borderTop: '1px solid var(--border)',
+          color: 'var(--red)',
+          fontSize: 11,
+          textAlign: 'center',
+          fontWeight: 600,
+        }}>
+          Trade Declined - {trade.reason || 'Not interested'}
+        </div>
+      )}
     </div>
   );
 }
