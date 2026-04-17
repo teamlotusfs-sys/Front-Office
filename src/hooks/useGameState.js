@@ -16,6 +16,14 @@ function random() {
   throw new Error('Secure randomness is unavailable in this environment.');
 }
 
+// Helper to parse date string "Oct 15" to comparable format
+function parseDate(dateStr) {
+  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+  const [month, day] = dateStr.split(' ');
+  const monthIndex = months.indexOf(month);
+  return monthIndex * 100 + parseInt(day);
+}
+
 export function GameProvider({ children }) {
   const [gameState, setGameState] = useState(null);
 
@@ -85,13 +93,20 @@ export function GameProvider({ children }) {
   const simulateGame = useCallback(() => {
     setGameState(prev => {
       if (!prev) return prev;
-      const nextGame = prev.schedule.find(g => !g.played);
-      if (!nextGame) return prev;
+      
+      // Find next unplayed game by date order
+      const unplayedGames = prev.schedule.filter(g => !g.played);
+      if (!unplayedGames.length) return prev;
+      
+      // Sort by date and get the first one
+      const nextGame = unplayedGames.sort((a, b) => parseDate(a.date) - parseDate(b.date))[0];
+      
       const won = random() > 0.5;
       const score = { us: won ? 108 + Math.floor(random() * 15) : 95 + Math.floor(random() * 15), them: 0 };
       score.them = won ? score.us - 5 - Math.floor(random() * 15) : score.us + 5 + Math.floor(random() * 15);
       const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
       const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
+      
       return {
         ...prev,
         wins: won ? prev.wins + 1 : prev.wins,
