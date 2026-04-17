@@ -12,7 +12,7 @@ export default function Schedule() {
   months.forEach(m => { gamesByMonth[m] = schedule.filter(g => g.date.startsWith(m)); });
 
   const currentMonth = gamesByMonth[selectedMonth] || [];
-  const daysInMonth = Math.max(...currentMonth.map(g => parseInt(g.date.split(' ')[1]))); // Get max day
+  const daysInMonth = currentMonth.length > 0 ? Math.max(...currentMonth.map(g => parseInt(g.date.split(' ')[1]))) : 0;
 
   const winStreak = (() => {
     const played = schedule.filter(g => g.played).reverse();
@@ -61,7 +61,7 @@ export default function Schedule() {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 10, marginBottom: 20 }}>
         {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
           <div
             key={day}
@@ -89,11 +89,11 @@ export default function Schedule() {
             <div
               key={day}
               style={{
-                background: hasGame ? 'var(--bg-card)' : 'transparent',
-                border: hasGame ? '1px solid var(--border)' : '1px solid transparent',
+                background: hasGame ? 'var(--bg-card)' : 'var(--bg-surface)',
+                border: '1px solid var(--border)',
                 borderRadius: 8,
                 padding: 12,
-                minHeight: 80,
+                minHeight: 90,
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 6,
@@ -119,7 +119,7 @@ export default function Schedule() {
 
               {hasGame && (
                 <>
-                  <div style={{ fontSize: 12, fontWeight: 600 }}>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-primary)' }}>
                     {game.isHome ? 'vs' : '@'} {game.opponent}
                   </div>
                   <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
