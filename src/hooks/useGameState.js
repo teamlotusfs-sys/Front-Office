@@ -30,7 +30,12 @@ export function GameProvider({ children }) {
   const startGame = useCallback((teamId, gmName) => {
     const team = NBA_TEAMS.find(t => t.id === teamId);
     const allRosters = {};
-    NBA_TEAMS.forEach(t => { allRosters[t.id] = generateRoster(t.id); });
+    const allSchedules = {};
+    
+    NBA_TEAMS.forEach(t => { 
+      allRosters[t.id] = generateRoster(t.id);
+      allSchedules[t.id] = generateSchedule(t.id);
+    });
 
     setGameState({
       team,
@@ -41,7 +46,8 @@ export function GameProvider({ children }) {
       wins: 0,
       losses: 0,
       roster: allRosters[teamId],
-      schedule: generateSchedule(teamId),
+      schedule: allSchedules[teamId],
+      allSchedules,
       draftPicks: generateDraftPicks(teamId),
       freeAgents: generateFreeAgents(40),
       allRosters,
@@ -94,18 +100,71 @@ export function GameProvider({ children }) {
     setGameState(prev => {
       if (!prev) return prev;
       
-      // Find next unplayed game by date order
+      // Find next unplayed game by date order for YOUR team
       const unplayedGames = prev.schedule.filter(g => !g.played);
       if (!unplayedGames.length) return prev;
       
-      // Sort by date and get the first one
       const nextGame = unplayedGames.sort((a, b) => parseDate(a.date) - parseDate(b.date))[0];
       
-      const won = random() > 0.5;
+      // Simulate YOUR game with team ratings
+      const yourTeam = prev.team;
+      const opponent = NBA_TEAMS.find(t => t.abbr === nextGame.opponent);
+      
+      // Win probability based on team ratings
+      const yourRating = yourTeam.rating;
+      const oppRating = opponent.rating;
+      const ratingDiff = yourRating - oppRating;
+      
+      // Home court advantage: +3 rating points
+      const adjustedRating = yourRating + (nextGame.isHome ? 3 : -3);
+      const adjustedOppRating = oppRating - (nextGame.isHome ? 3 : -3);
+      
+      // Calculate win probability
+      const totalRating = adjustedRating + adjustedOppRating;
+      const winProbability = adjustedRating / totalRating;
+      
+      // Add randomness - better teams win more but upsets still possible
+      const won = random() < winProbability;
       const score = { us: won ? 108 + Math.floor(random() * 15) : 95 + Math.floor(random() * 15), them: 0 };
       score.them = won ? score.us - 5 - Math.floor(random() * 15) : score.us + 5 + Math.floor(random() * 15);
+      
       const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
       const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
+      
+      // Also simulate OTHER teams' unplayed games on the same day
+      const gameDate = nextGame.date;
+      const newAllSchedules = { ...prev.allSchedules };
+      
+      NBA_TEAMS.forEach(team => {
+        if (team.id !== prev.team.id) {
+          const teamSchedule = newAllSchedules[team.id];
+          const gamesOnSameDay = teamSchedule.filter(g => g.date === gameDate && !g.played);
+          
+          gamesOnSameDay.forEach(game => {
+            const oppTeam = NBA_TEAMS.find(t => t.abbr === game.opponent);
+            
+            const teamRating = team.rating;
+            const oppTeamRating = oppTeam.rating;
+            const adjustedTeamRating = teamRating + (game.isHome ? 3 : -3);
+            const adjustedOppTeamRating = oppTeamRating - (game.isHome ? 3 : -3);
+            
+            const totalTeamRating = adjustedTeamRating + adjustedOppTeamRating;
+            const teamWinProb = adjustedTeamRating / totalTeamRating;
+            const teamWon = random() < teamWinProb;
+            
+            const teamScore = { 
+              us: teamWon ? 108 + Math.floor(random() * 15) : 95 + Math.floor(random() * 15), 
+              them: 0 
+            };
+            teamScore.them = teamWon ? teamScore.us - 5 - Math.floor(random() * 15) : teamScore.us + 5 + Math.floor(random() * 15);
+            
+            // Update the schedule for this team
+            newAllSchedules[team.id] = teamSchedule.map(g => 
+              g.id === game.id ? { ...g, played: true, won: teamWon, score: teamScore } : g
+            );
+          });
+        }
+      });
       
       return {
         ...prev,
@@ -113,6 +172,7 @@ export function GameProvider({ children }) {
         losses: !won ? prev.losses + 1 : prev.losses,
         week: prev.week + 1,
         schedule: prev.schedule.map(g => g.id === nextGame.id ? { ...g, played: true, won, score } : g),
+        allSchedules: newAllSchedules,
         notifications: [newNotif, ...prev.notifications],
       };
     });
