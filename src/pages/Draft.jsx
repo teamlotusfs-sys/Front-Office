@@ -1,0 +1,3 @@
+// Contents of Draft.jsx
+import React from 'react';
+...
