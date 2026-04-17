@@ -8,21 +8,32 @@ export default function Standings() {
   const [conf, setConf] = useState('All');
 
   // Build standings with our real record injected
-  const standings = NBA_TEAMS.map(t => {
+  const allStandings = NBA_TEAMS.map(t => {
     const [w, l] = t.record.split('-').map(Number);
-    if (t.id === team.id) return { ...t, w: wins, l: losses, gb: 0 };
+    if (t.id === team.id) return { ...t, w: wins, l: losses };
     return { ...t, w, l };
-  }).filter(t => conf === 'All' || t.conf === conf)
-    .sort((a, b) => {
-      const pctA = a.w / (a.w + a.l) || 0;
-      const pctB = b.w / (b.w + b.l) || 0;
-      return pctB - pctA;
-    })
-    .map((t, i, arr) => {
-      const leader = arr[0];
-      const gb = ((leader.w - t.w) + (t.l - leader.l)) / 2;
-      return { ...t, rank: i + 1, gb: gb > 0 ? gb.toFixed(1) : '—' };
-    });
+  });
+
+  // Filter by conference
+  const filtered = allStandings.filter(t => conf === 'All' || t.conf === conf);
+
+  // Sort by win percentage
+  const sorted = filtered.sort((a, b) => {
+    const pctA = a.w / (a.w + a.l) || 0;
+    const pctB = b.w / (b.w + b.l) || 0;
+    return pctB - pctA;
+  });
+
+  // Add rank and games behind
+  const standings = sorted.map((t, i) => {
+    const leader = sorted[0];
+    const leaderWins = leader.w;
+    const leaderLosses = leader.l;
+    const gb = leaderWins === t.w && leaderLosses === t.l 
+      ? '—' 
+      : ((leaderWins - t.w) + (t.l - leaderLosses)) / 2;
+    return { ...t, rank: i + 1, gb: typeof gb === 'number' ? gb.toFixed(1) : gb };
+  });
 
   return (
     <div>
@@ -31,8 +42,20 @@ export default function Standings() {
 
       <div style={{ display: 'flex', gap: 4, marginBottom: 20 }}>
         {['All', 'East', 'West'].map(c => (
-          <button key={c} onClick={() => setConf(c)}
-            style={{ background: conf === c ? 'var(--accent-dim)' : 'var(--bg-card)', border: `1px solid ${conf === c ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 4, color: conf === c ? 'var(--accent)' : 'var(--text-secondary)', padding: '7px 16px', fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>
+          <button
+            key={c}
+            onClick={() => setConf(c)}
+            style={{
+              background: conf === c ? 'var(--accent-dim)' : 'var(--bg-card)',
+              border: `1px solid ${conf === c ? 'var(--accent)' : 'var(--border)'}`,
+              borderRadius: 4,
+              color: conf === c ? 'var(--accent)' : 'var(--text-secondary)',
+              padding: '7px 14px',
+              fontSize: 12,
+              cursor: 'pointer',
+              transition: 'all 0.15s'
+            }}
+          >
             {c === 'All' ? 'All Teams' : `${c}ern Conference`}
           </button>
         ))}
@@ -49,11 +72,15 @@ export default function Standings() {
             {standings.map(t => {
               const isMyTeam = t.id === team.id;
               const pct = t.w + t.l > 0 ? (t.w / (t.w + t.l)).toFixed(3) : '.000';
-            
+              const isPlayoff = t.rank <= (conf === 'All' ? 16 : 8);
+
               return (
-                <tr key={t.id} style={isMyTeam ? { background: 'rgba(232,255,71,0.08)', outline: '1px solid var(--accent)', outlineOffset: '-1px' } : {}}>
+                <tr
+                  key={t.id}
+                  style={isMyTeam ? { background: 'rgba(232,255,71,0.08)', outline: '1px solid var(--accent)', outlineOffset: '-1px' } : {}}
+                >
                   <td className="mono muted" style={{ fontSize: 13 }}>
-                    {t.rank <= (conf === 'All' ? 16 : 8) && <span style={{ color: 'var(--green)', marginRight: 4, fontSize: 10 }}>●</span>}
+                    {isPlayoff && <span style={{ color: 'var(--green)', marginRight: 4, fontSize: 10 }}>●</span>}
                     {t.rank}
                   </td>
                   <td>
@@ -73,7 +100,14 @@ export default function Standings() {
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <div style={{ height: 4, width: 50, background: 'var(--bg-hover)', borderRadius: 2, overflow: 'hidden' }}>
-                        <div style={{ height: '100%', width: `${((t.rating - 55) / 45) * 100}%`, background: t.rating >= 80 ? 'var(--accent)' : t.rating >= 70 ? 'var(--green)' : 'var(--orange)', borderRadius: 2 }} />
+                        <div
+                          style={{
+                            height: '100%',
+                            width: `${((t.rating - 55) / 45) * 100}%`,
+                            background: t.rating >= 80 ? 'var(--accent)' : t.rating >= 70 ? 'var(--green)' : 'var(--orange)',
+                            borderRadius: 2
+                          }}
+                        />
                       </div>
                       <span className="mono" style={{ fontSize: 12 }}>{t.rating}</span>
                     </div>
