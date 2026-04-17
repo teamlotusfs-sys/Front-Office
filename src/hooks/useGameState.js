@@ -51,6 +51,7 @@ export function GameProvider({ children }) {
       draftPicks: generateDraftPicks(teamId),
       freeAgents: generateFreeAgents(40),
       allRosters,
+      tradeHistory: [],
       notifications: [
         { id: 1, type: 'info', text: `Welcome, GM ${gmName}! The ${team.name} rebuild starts now.`, read: false },
         { id: 2, type: 'info', text: 'Check the Free Agents tab to sign players.', read: false },
@@ -173,8 +174,57 @@ export function GameProvider({ children }) {
     });
   }, []);
 
+  const executeTrade = useCallback((trade) => {
+    setGameState(prev => {
+      if (!prev) return prev;
+      
+      const yourPlayers = trade.yourPlayers;
+      const theirPlayers = trade.theirPlayers;
+      const theirTeam = trade.from;
+      
+      // Remove your players, add their players
+      let newRoster = prev.roster.filter(p => !yourPlayers.find(tp => tp.id === p.id));
+      newRoster = [...newRoster, ...theirPlayers.map(p => ({ ...p, teamId: prev.team.id }))];
+      
+      // Update all rosters
+      const newAllRosters = { ...prev.allRosters };
+      newAllRosters[prev.team.id] = newRoster;
+      newAllRosters[theirTeam.id] = prev.allRosters[theirTeam.id]
+        .filter(p => !theirPlayers.find(tp => tp.id === p.id))
+        .concat(yourPlayers.map(p => ({ ...p, teamId: theirTeam.id })));
+      
+      const tradeDescription = `Traded ${trade.yourPlayers.map(p => p.lastName).join(', ')} for ${trade.theirPlayers.map(p => p.lastName).join(', ')} with ${theirTeam.abbr}`;
+      const newNotif = { id: Date.now(), type: 'success', text: tradeDescription, read: false };
+      
+      const newTradeHistory = [...prev.tradeHistory, {
+        id: Date.now(),
+        week: prev.week,
+        yourPlayers: trade.yourPlayers,
+        theirPlayers: trade.theirPlayers,
+        with: theirTeam,
+        timestamp: new Date().toLocaleString(),
+      }];
+      
+      return {
+        ...prev,
+        roster: newRoster,
+        allRosters: newAllRosters,
+        tradeHistory: newTradeHistory,
+        notifications: [newNotif, ...prev.notifications],
+      };
+    });
+  }, []);
+
+  const declineTrade = useCallback((trade) => {
+    setGameState(prev => {
+      if (!prev) return prev;
+      const newNotif = { id: Date.now(), type: 'info', text: `Trade declined with ${trade.from.abbr}`, read: false };
+      return { ...prev, notifications: [newNotif, ...prev.notifications] };
+    });
+  }, []);
+
   return (
-    <GameContext.Provider value={{ gameState, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame }}>
+    <GameContext.Provider value={{ gameState, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade }}>
       {children}
     </GameContext.Provider>
   );
