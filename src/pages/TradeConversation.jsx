@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { NBA_TEAMS, formatSalary, ovrColor } from '../data/nbaData';
-import { calculatePlayerValue, evaluateTrade } from '../data/TradeSystem';
+import { NBA_TEAMS } from '../data/nbaData';
 
 export default function TradeConversation({ 
   trade, 
@@ -17,7 +16,6 @@ export default function TradeConversation({
     }
   ]);
   
-  const [counterMode, setCounterMode] = useState(false);
   const team = NBA_TEAMS.find(t => t.id === trade.from.id);
 
   const handleAccept = () => {
@@ -44,7 +42,7 @@ export default function TradeConversation({
       text: 'Let me counter that...',
       timestamp: Date.now(),
     }]);
-    setCounterMode(true);
+    onCounter(trade);
   };
 
   return (
