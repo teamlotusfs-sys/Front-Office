@@ -1,0 +1,224 @@
+import React, { useState } from 'react';
+import { NBA_TEAMS, formatSalary, ovrColor } from '../data/nbaData';
+import { calculatePlayerValue, evaluateTrade } from '../data/TradeSystem';
+
+export default function TradeConversation({ 
+  trade, 
+  onAccept, 
+  onDecline, 
+  onCounter,
+  isIncoming = false 
+}) {
+  const [messages, setMessages] = useState([
+    {
+      from: isIncoming ? 'gm' : 'you',
+      text: trade.message || (isIncoming ? `I've got a trade offer for you` : 'Check out this trade idea'),
+      timestamp: Date.now(),
+    }
+  ]);
+  
+  const [counterMode, setCounterMode] = useState(false);
+  const team = NBA_TEAMS.find(t => t.id === trade.from.id);
+
+  const handleAccept = () => {
+    setMessages([...messages, {
+      from: 'you',
+      text: '✓ Trade Accepted',
+      timestamp: Date.now(),
+    }]);
+    setTimeout(() => onAccept(trade), 300);
+  };
+
+  const handleDecline = () => {
+    setMessages([...messages, {
+      from: 'you',
+      text: '✗ Trade Declined',
+      timestamp: Date.now(),
+    }]);
+    setTimeout(() => onDecline(trade), 300);
+  };
+
+  const handleCounter = () => {
+    setMessages([...messages, {
+      from: 'you',
+      text: 'Let me counter that...',
+      timestamp: Date.now(),
+    }]);
+    setCounterMode(true);
+  };
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      background: 'var(--bg-card)',
+      borderRadius: 8,
+      border: '1px solid var(--border)',
+      overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+        padding: '16px',
+        borderBottom: '1px solid var(--border)',
+        background: 'var(--bg-surface)',
+      }}>
+        <div style={{
+          width: 12,
+          height: 12,
+          borderRadius: '50%',
+          background: team.color,
+        }} />
+        <div>
+          <div style={{ fontSize: 14, fontWeight: 600 }}>{team.abbr}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{team.name}</div>
+        </div>
+      </div>
+
+      {/* Messages */}
+      <div style={{
+        flex: 1,
+        overflow: 'auto',
+        padding: '16px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+      }}>
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            style={{
+              display: 'flex',
+              justifyContent: msg.from === 'you' ? 'flex-end' : 'flex-start',
+            }}
+          >
+            <div style={{
+              background: msg.from === 'you' ? 'var(--accent)' : 'var(--bg-hover)',
+              color: msg.from === 'you' ? '#0a0a0f' : 'var(--text-primary)',
+              padding: '10px 14px',
+              borderRadius: 8,
+              maxWidth: '80%',
+              fontSize: 13,
+              fontWeight: msg.from === 'you' ? 600 : 400,
+            }}>
+              {msg.text}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Trade Details */}
+      <div style={{
+        borderTop: '1px solid var(--border)',
+        padding: '12px 16px',
+        background: 'var(--bg-surface)',
+        fontSize: 12,
+        maxHeight: 200,
+        overflowY: 'auto',
+      }}>
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ color: 'var(--text-secondary)', marginBottom: 4 }}>They Give:</div>
+          {trade.theirPlayers?.map(p => (
+            <div key={p.id} style={{ fontSize: 11, color: 'var(--text-primary)', marginBottom: 2 }}>
+              • {p.firstName} {p.lastName} ({p.ovr} OVR)
+            </div>
+          ))}
+        </div>
+        <div>
+          <div style={{ color: 'var(--text-secondary)', marginBottom: 4 }}>You Give:</div>
+          {trade.yourPlayers?.map(p => (
+            <div key={p.id} style={{ fontSize: 11, color: 'var(--text-primary)', marginBottom: 2 }}>
+              • {p.firstName} {p.lastName} ({p.ovr} OVR)
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div style={{
+        display: 'flex',
+        gap: 8,
+        padding: '12px 16px',
+        borderTop: '1px solid var(--border)',
+        background: 'var(--bg-surface)',
+      }}>
+        <button
+          onClick={handleDecline}
+          style={{
+            flex: 1,
+            padding: '8px 12px',
+            background: 'var(--bg-hover)',
+            border: '1px solid var(--border)',
+            borderRadius: 4,
+            color: 'var(--text-secondary)',
+            fontSize: 11,
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = 'var(--red)';
+            e.currentTarget.style.color = 'var(--red)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderColor = 'var(--border)';
+            e.currentTarget.style.color = 'var(--text-secondary)';
+          }}
+        >
+          Decline
+        </button>
+        {trade.countered && (
+          <button
+            onClick={handleCounter}
+            style={{
+              flex: 1,
+              padding: '8px 12px',
+              background: 'var(--bg-hover)',
+              border: '1px solid var(--accent)',
+              borderRadius: 4,
+              color: 'var(--accent)',
+              fontSize: 11,
+              fontWeight: 600,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(232, 255, 71, 0.1)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'var(--bg-hover)';
+            }}
+          >
+            Counter
+          </button>
+        )}
+        <button
+          onClick={handleAccept}
+          style={{
+            flex: 1,
+            padding: '8px 12px',
+            background: 'var(--accent)',
+            border: 'none',
+            borderRadius: 4,
+            color: '#0a0a0f',
+            fontSize: 11,
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+          }}
+        >
+          Accept
+        </button>
+      </div>
+    </div>
+  );
+}
