@@ -4,13 +4,15 @@ import { useGame } from '../hooks/useGameState';
 export default function Schedule() {
   const { gameState, simulateGame } = useGame();
   const { schedule, wins, losses } = gameState;
-  const [filter, setFilter] = useState('all');
+  const [selectedMonth, setSelectedMonth] = useState('Oct');
 
-  const filtered = schedule.filter(g => {
-    if (filter === 'played') return g.played;
-    if (filter === 'upcoming') return !g.played;
-    return true;
-  });
+  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+  
+  const gamesByMonth = {};
+  months.forEach(m => { gamesByMonth[m] = schedule.filter(g => g.date.startsWith(m)); });
+
+  const currentMonth = gamesByMonth[selectedMonth] || [];
+  const daysInMonth = Math.max(...currentMonth.map(g => parseInt(g.date.split(' ')[1]))); // Get max day
 
   const winStreak = (() => {
     const played = schedule.filter(g => g.played).reverse();
@@ -20,6 +22,10 @@ export default function Schedule() {
     for (const g of played) { if (g.won === type) count++; else break; }
     return { count, type };
   })();
+
+  const getDayGames = (day) => {
+    return currentMonth.filter(g => parseInt(g.date.split(' ')[1]) === day);
+  };
 
   return (
     <div>
@@ -31,48 +37,132 @@ export default function Schedule() {
       </p>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 20, alignItems: 'center' }}>
-        {['all', 'played', 'upcoming'].map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{ background: filter === f ? 'var(--accent-dim)' : 'var(--bg-card)', border: `1px solid ${filter === f ? 'var(--accent)' : 'var(--border)'}`, borderRadius: 4, color: filter === f ? 'var(--accent)' : 'var(--text-secondary)', padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontWeight: 600, textTransform: 'capitalize' }}>
-            {f === 'all' ? 'All Games' : f === 'played' ? 'Results' : 'Upcoming'}
+        {months.map(m => (
+          <button
+            key={m}
+            onClick={() => setSelectedMonth(m)}
+            style={{
+              background: selectedMonth === m ? 'var(--accent-dim)' : 'var(--bg-card)',
+              border: `1px solid ${selectedMonth === m ? 'var(--accent)' : 'var(--border)'}`,
+              borderRadius: 4,
+              color: selectedMonth === m ? 'var(--accent)' : 'var(--text-secondary)',
+              padding: '7px 14px',
+              fontSize: 12,
+              cursor: 'pointer',
+              transition: 'all 0.15s',
+              fontWeight: 600,
+            }}
+          >
+            {m}
           </button>
         ))}
-        <button className="action-btn success" onClick={simulateGame} style={{ marginLeft: 'auto' }}>▶ Sim Next</button>
+        <button className="action-btn success" onClick={simulateGame} style={{ marginLeft: 'auto' }}>
+          ▶ Sim Next
+        </button>
       </div>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th><th>Date</th><th>Matchup</th><th>Home/Away</th><th>Result</th><th>Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filtered.map((g, i) => {
-              const isNext = !g.played && schedule.findIndex(x => !x.played) === schedule.indexOf(g);
-              return (
-                <tr key={g.id} style={isNext ? { background: 'rgba(232,255,71,0.05)', outline: '1px solid var(--accent)' } : {}}>
-                  <td className="muted mono" style={{ fontSize: 11 }}>{schedule.indexOf(g) + 1}</td>
-                  <td className="muted" style={{ fontSize: 12 }}>{g.date}</td>
-                  <td style={{ fontWeight: isNext ? 600 : 400 }}>
-                    {isNext && <span style={{ fontSize: 10, color: 'var(--accent)', fontFamily: 'DM Mono, monospace', marginRight: 6 }}>NEXT ▶</span>}
-                    {g.isHome ? 'vs' : '@'} {g.oppName}
-                  </td>
-                  <td><span className="badge badge-muted">{g.isHome ? 'HOME' : 'AWAY'}</span></td>
-                  <td>
-                    {g.played ? (
-                      <span className={`badge ${g.won ? 'badge-green' : 'badge-red'}`}>{g.won ? 'W' : 'L'}</span>
-                    ) : (
-                      <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>—</span>
-                    )}
-                  </td>
-                  <td className="mono" style={{ fontSize: 13 }}>
-                    {g.played ? `${g.score.us}–${g.score.them}` : '—'}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 10 }}>
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          <div
+            key={day}
+            style={{
+              textAlign: 'center',
+              fontSize: 11,
+              fontWeight: 600,
+              color: 'var(--text-secondary)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              paddingBottom: 8,
+              borderBottom: '1px solid var(--border)',
+            }}
+          >
+            {day}
+          </div>
+        ))}
+
+        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map(day => {
+          const games = getDayGames(day);
+          const hasGame = games.length > 0;
+          const game = games[0];
+
+          return (
+            <div
+              key={day}
+              style={{
+                background: hasGame ? 'var(--bg-card)' : 'transparent',
+                border: hasGame ? '1px solid var(--border)' : '1px solid transparent',
+                borderRadius: 8,
+                padding: 12,
+                minHeight: 80,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 6,
+                cursor: hasGame ? 'pointer' : 'default',
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={(e) => {
+                if (hasGame) {
+                  e.currentTarget.style.borderColor = 'var(--accent)';
+                  e.currentTarget.style.background = 'var(--accent-dim)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (hasGame) {
+                  e.currentTarget.style.borderColor = 'var(--border)';
+                  e.currentTarget.style.background = 'var(--bg-card)';
+                }
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-secondary)' }}>
+                {day}
+              </div>
+
+              {hasGame && (
+                <>
+                  <div style={{ fontSize: 12, fontWeight: 600 }}>
+                    {game.isHome ? 'vs' : '@'} {game.opponent}
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-secondary)' }}>
+                    {game.isHome ? 'HOME' : 'AWAY'}
+                  </div>
+
+                  {game.played ? (
+                    <>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: game.won ? 'var(--green)' : 'var(--red)',
+                          marginTop: 'auto',
+                        }}
+                      >
+                        {game.won ? 'W' : 'L'}
+                      </div>
+                      <div style={{ fontSize: 11, fontFamily: 'DM Mono, monospace', color: 'var(--text-secondary)' }}>
+                        {game.score.us}–{game.score.them}
+                      </div>
+                    </>
+                  ) : (
+                    <div
+                      style={{
+                        fontSize: 10,
+                        background: 'var(--accent)',
+                        color: '#0a0a0f',
+                        padding: '4px 8px',
+                        borderRadius: 4,
+                        textAlign: 'center',
+                        fontWeight: 600,
+                        marginTop: 'auto',
+                      }}
+                    >
+                      UPCOMING
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
