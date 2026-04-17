@@ -20,8 +20,19 @@ export default function StartPage() {
   }).sort((a, b) => a.rating - b.rating);
 
   function handleStart() {
-    if (!gmName.trim() || !selectedTeam) return;
+    console.log('🔍 handleStart called');
+    console.log('gmName:', gmName);
+    console.log('selectedTeam:', selectedTeam);
+    
+    if (!gmName.trim() || !selectedTeam) {
+      console.log('❌ Missing data - returning early');
+      return;
+    }
+    
+    console.log('✅ Calling startGame with:', selectedTeam.id, gmName.trim());
     startGame(selectedTeam.id, gmName.trim());
+    
+    console.log('✅ Navigating to /dashboard');
     navigate('/dashboard');
   }
 
