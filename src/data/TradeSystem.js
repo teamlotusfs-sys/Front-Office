@@ -179,8 +179,6 @@ export function evaluateTrade(yourPlayers, yourPicks, theirPlayers, theirPicks, 
   
   // Determine accept/decline/counter
   let response;
-  let accepted = false;
-  let countered = false;
   
   if (valueDiffPercent < 8) {
     // Very fair trade
