@@ -1,4 +1,3 @@
-
 function random() {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     const arr = new Uint32Array(1);
@@ -176,12 +175,12 @@ export function evaluateTrade(yourPlayers, yourPicks, theirPlayers, theirPicks, 
   
   const personality = getGMPersonality(theirTeamId);
   
-  // Determine accept/decline/counter
+  // Determine accept/decline/counter - MUCH more lenient now
   let response;
   
-  if (valueDiffPercent < 8) {
-    // Very fair trade
-    if (random() > 0.3 || personality === GM_PERSONALITIES.DESPERATE) {
+  if (valueDiffPercent < 10) {
+    // Very fair trade - high accept rate
+    if (random() > 0.2 || personality === GM_PERSONALITIES.DESPERATE) {
       response = {
         type: 'accept',
         message: RESPONSE_TEMPLATES[personality].accept[Math.floor(random() * RESPONSE_TEMPLATES[personality].accept.length)],
@@ -195,16 +194,16 @@ export function evaluateTrade(yourPlayers, yourPicks, theirPlayers, theirPicks, 
         countered: true,
       };
     }
-  } else if (valueDiffPercent < 15) {
-    // Slightly off, might counter or decline
+  } else if (valueDiffPercent < 20) {
+    // Slightly off - mostly accepts/counters
     const rand = random();
-    if (personality === GM_PERSONALITIES.DESPERATE && rand > 0.4) {
+    if (rand > 0.3 || personality === GM_PERSONALITIES.DESPERATE || personality === GM_PERSONALITIES.AGGRESSIVE) {
       response = {
         type: 'accept',
         message: RESPONSE_TEMPLATES[personality].accept[Math.floor(random() * RESPONSE_TEMPLATES[personality].accept.length)],
         accepted: true,
       };
-    } else if (rand > 0.5 || personality === GM_PERSONALITIES.PASSIVE) {
+    } else if (rand > 0.15) {
       response = {
         type: 'counter',
         message: RESPONSE_TEMPLATES[personality].counter[Math.floor(random() * RESPONSE_TEMPLATES[personality].counter.length)],
@@ -215,13 +214,20 @@ export function evaluateTrade(yourPlayers, yourPicks, theirPlayers, theirPicks, 
       response = {
         type: 'decline',
         message: RESPONSE_TEMPLATES[personality].decline[Math.floor(random() * RESPONSE_TEMPLATES[personality].decline.length)],
-        reason: 'Values are close but not aligned',
+        reason: 'Values are a bit off',
         accepted: false,
       };
     }
-  } else if (valueDiffPercent < 25) {
-    // Noticeably off
-    if (personality === GM_PERSONALITIES.DESPERATE && random() > 0.5) {
+  } else if (valueDiffPercent < 35) {
+    // Noticeably off - still mostly accepts
+    const rand = random();
+    if (rand > 0.4 || personality === GM_PERSONALITIES.DESPERATE) {
+      response = {
+        type: 'accept',
+        message: RESPONSE_TEMPLATES[personality].accept[Math.floor(random() * RESPONSE_TEMPLATES[personality].accept.length)],
+        accepted: true,
+      };
+    } else if (rand > 0.2) {
       response = {
         type: 'counter',
         message: RESPONSE_TEMPLATES[personality].counter[Math.floor(random() * RESPONSE_TEMPLATES[personality].counter.length)],
@@ -236,14 +242,46 @@ export function evaluateTrade(yourPlayers, yourPicks, theirPlayers, theirPicks, 
         accepted: false,
       };
     }
+  } else if (valueDiffPercent < 50) {
+    // Pretty far off - mixed responses
+    const rand = random();
+    if (rand > 0.5 || personality === GM_PERSONALITIES.DESPERATE) {
+      response = {
+        type: 'accept',
+        message: RESPONSE_TEMPLATES[personality].accept[Math.floor(random() * RESPONSE_TEMPLATES[personality].accept.length)],
+        accepted: true,
+      };
+    } else if (rand > 0.3) {
+      response = {
+        type: 'counter',
+        message: RESPONSE_TEMPLATES[personality].counter[Math.floor(random() * RESPONSE_TEMPLATES[personality].counter.length)],
+        accepted: false,
+        countered: true,
+      };
+    } else {
+      response = {
+        type: 'decline',
+        message: RESPONSE_TEMPLATES[personality].decline[Math.floor(random() * RESPONSE_TEMPLATES[personality].decline.length)],
+        reason: 'Deal is way too one-sided',
+        accepted: false,
+      };
+    }
   } else {
-    // Way too far off
-    response = {
-      type: 'decline',
-      message: RESPONSE_TEMPLATES[personality].decline[Math.floor(random() * RESPONSE_TEMPLATES[personality].decline.length)],
-      reason: 'Deal is way too one-sided',
-      accepted: false,
-    };
+    // Extremely lopsided - might still accept if desperate
+    if (personality === GM_PERSONALITIES.DESPERATE && random() > 0.3) {
+      response = {
+        type: 'accept',
+        message: RESPONSE_TEMPLATES[personality].accept[Math.floor(random() * RESPONSE_TEMPLATES[personality].accept.length)],
+        accepted: true,
+      };
+    } else {
+      response = {
+        type: 'decline',
+        message: RESPONSE_TEMPLATES[personality].decline[Math.floor(random() * RESPONSE_TEMPLATES[personality].decline.length)],
+        reason: 'Not even close',
+        accepted: false,
+      };
+    }
   }
   
   return {
