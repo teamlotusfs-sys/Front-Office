@@ -37,18 +37,28 @@ const lastNames = ['Johnson', 'Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 
 
 let playerIdCounter = 1;
 
+
+function random() {
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    return arr[0] / 4294967296;
+  }
+  return (Date.now() % 1000) / 1000;
+}
+
 export function generatePlayer(teamId, overrides = {}) {
-  const pos = positions[Math.floor(Math.random() * positions.length)];
-  const age = 19 + Math.floor(Math.random() * 16);
-  const ovr = Math.max(60, Math.min(99, Math.floor(Math.random() * 35) + 62));
-  const pot = Math.min(99, ovr + Math.floor(Math.random() * 20));
-  const salary = Math.round((ovr - 60) * 0.8 + Math.random() * 5 + 1) * 1_000_000;
-  const yearsLeft = 1 + Math.floor(Math.random() * 4);
+  const pos = positions[Math.floor(random() * positions.length)];
+  const age = 19 + Math.floor(random() * 16);
+  const ovr = Math.max(60, Math.min(99, Math.floor(random() * 35) + 62));
+  const pot = Math.min(99, ovr + Math.floor(random() * 20));
+  const salary = Math.round((ovr - 60) * 0.8 + random() * 5 + 1) * 1_000_000;
+  const yearsLeft = 1 + Math.floor(random() * 4);
 
   return {
     id: playerIdCounter++,
-    firstName: firstNames[Math.floor(Math.random() * firstNames.length)],
-    lastName: lastNames[Math.floor(Math.random() * lastNames.length)],
+    firstName: firstNames[Math.floor(random() * firstNames.length)],
+    lastName: lastNames[Math.floor(random() * lastNames.length)],
     pos,
     age,
     ovr,
@@ -57,9 +67,9 @@ export function generatePlayer(teamId, overrides = {}) {
     yearsLeft,
     teamId,
     stats: {
-      ppg: Math.round((ovr * 0.25 + Math.random() * 8) * 10) / 10,
-      rpg: pos === 'C' || pos === 'PF' ? Math.round((5 + Math.random() * 7) * 10) / 10 : Math.round((2 + Math.random() * 5) * 10) / 10,
-      apg: pos === 'PG' ? Math.round((4 + Math.random() * 7) * 10) / 10 : Math.round((1 + Math.random() * 4) * 10) / 10,
+      ppg: Math.round((ovr * 0.25 + random() * 8) * 10) / 10,
+      rpg: pos === 'C' || pos === 'PF' ? Math.round((5 + random() * 7) * 10) / 10 : Math.round((2 + random() * 5) * 10) / 10,
+      apg: pos === 'PG' ? Math.round((4 + random() * 7) * 10) / 10 : Math.round((1 + random() * 4) * 10) / 10,
     },
     ...overrides,
   };
@@ -75,15 +85,15 @@ export function generateSchedule(teamId) {
   const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
   let gameId = 1;
   for (let i = 0; i < 40; i++) {
-    const opp = opponents[Math.floor(Math.random() * opponents.length)];
+    const opp = opponents[Math.floor(random() * opponents.length)];
     const month = months[Math.floor(i / 6)];
-    const day = 1 + Math.floor(Math.random() * 28);
-    const isHome = Math.random() > 0.5;
+    const day = 1 + Math.floor(random() * 28);
+    const isHome = random() > 0.5;
     const played = i < 20;
-    const won = played ? Math.random() > 0.45 : null;
+    const won = played ? random() > 0.45 : null;
     const score = played ? {
-      us: won ? 100 + Math.floor(Math.random() * 20) : 90 + Math.floor(Math.random() * 15),
-      them: won ? 90 + Math.floor(Math.random() * 15) : 100 + Math.floor(Math.random() * 20),
+      us: won ? 100 + Math.floor(random() * 20) : 90 + Math.floor(random() * 15),
+      them: won ? 90 + Math.floor(random() * 15) : 100 + Math.floor(random() * 20),
     } : null;
     games.push({ id: gameId++, opponent: opp.abbr, oppName: opp.name, date: `${month} ${day}`, isHome, played, won, score });
   }
