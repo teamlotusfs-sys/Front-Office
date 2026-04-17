@@ -4,7 +4,7 @@ import { NBA_TEAMS } from '../data/nbaData';
 
 export default function Standings() {
   const { gameState } = useGame();
-  const { team, wins, losses, schedule, allRosters } = gameState;
+  const { team, wins, losses, schedule } = gameState;
   const [conf, setConf] = useState('All');
 
   // Calculate wins/losses for all teams from their rosters in schedule
