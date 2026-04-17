@@ -43,9 +43,9 @@ export default function StartPage() {
         <div className="start-grid-bg" />
 
         <div className="start-logo-area">
-          <div className="start-icon">🏀</div>
-          <h1 className="start-title">REBUILD<span className="accent">MODE</span></h1>
-          <p className="start-sub">Build a dynasty from the ground up. Every pick counts.</p>
+          <div className="start-icon">🏢</div>
+          <h1 className="start-title">FRONT<span className="accent">OFFICE</span></h1>
+          <p className="start-sub">Build a dynasty from the ground up. Every decision counts.</p>
         </div>
 
         <div className="start-actions">
