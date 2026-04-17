@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
-import { evaluateTrade, calculateTradeValue } from '../data/TradeSystem';
+import { evaluateTrade } from '../data/TradeSystem';
 import TradeConversation from './TradeConversation';
 import PhonePopup from '../components/PhonePopup';
 
@@ -12,7 +12,6 @@ export default function Trades() {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [selectedYourPlayers, setSelectedYourPlayers] = useState([]);
   const [selectedTheirPlayers, setSelectedTheirPlayers] = useState([]);
-  const [tradeEval, setTradeEval] = useState(null);
   const [activeConversation, setActiveConversation] = useState(null);
   const [answeringPhone, setAnsweringPhone] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,14 +28,6 @@ export default function Trades() {
 
     const evaluation = evaluateTrade(yourPlayers, [], theirPlayers, [], selectedTeam.id);
     
-    setTradeEval({
-      from: selectedTeam,
-      yourPlayers,
-      theirPlayers,
-      picks: [],
-      ...evaluation,
-    });
-
     setActiveConversation({
       from: selectedTeam,
       yourPlayers,
