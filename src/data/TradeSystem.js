@@ -1,4 +1,3 @@
-import { NBA_TEAMS } from './nbaData';
 
 function random() {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
