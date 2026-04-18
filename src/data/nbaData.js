@@ -107,17 +107,48 @@ export function generateSchedule(teamId) {
   const games = [];
   const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
   let gameId = 1;
+  let currentDay = 1;
+  let currentMonthIndex = 0;
+  
   for (let i = 0; i < 40; i++) {
     const opp = opponents[Math.floor(random() * opponents.length)];
-    const month = months[Math.floor(i / 6)];
-    const day = 1 + Math.floor(random() * 28);
+    
+    // Update month every 6 games
+    currentMonthIndex = Math.floor(i / 6);
+    const month = months[currentMonthIndex];
+    
+    // Increment day, reset when month changes
+    if (i > 0 && i % 6 === 0) {
+      currentDay = 1;
+    }
+    currentDay += Math.floor(random() * 2) + 1; // 1-2 days between games
+    if (currentDay > 28) currentDay = 28;
+    
     const isHome = random() > 0.5;
-    const played = false; // NO GAMES PRE-PLAYED - ALL START AS UNPLAYED
+    const played = false;
     const won = null;
     const score = null;
-    games.push({ id: gameId++, opponent: opp.abbr, oppName: opp.name, date: `${month} ${day}`, isHome, played, won, score });
+    
+    games.push({ 
+      id: gameId++, 
+      opponent: opp.abbr, 
+      oppName: opp.name, 
+      date: `${month} ${currentDay}`,
+      week: Math.floor(i / 2) + 1,
+      isHome, 
+      played, 
+      won, 
+      score 
+    });
   }
-  return games;
+  
+  // Sort by date to ensure chronological order
+  return games.sort((a, b) => {
+    const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+    const dateA = months.indexOf(a.date.split(' ')[0]) * 100 + parseInt(a.date.split(' ')[1]);
+    const dateB = months.indexOf(b.date.split(' ')[0]) * 100 + parseInt(b.date.split(' ')[1]);
+    return dateA - dateB;
+  });
 }
 
 export function generateDraftPicks(teamId) {
