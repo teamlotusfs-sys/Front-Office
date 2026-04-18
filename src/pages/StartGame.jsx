@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
-import '../styles/StartGame.css';
+import './StartGame.css';
 
 export default function StartGame() {
   const { startGame } = useGame();
