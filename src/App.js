@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
 
 import { GameProvider } from './hooks/useGameState';
-import StartPage from './pages/StartPage';
+import StartGame from './pages/StartGame';
 import GameLayout from './components/GameLayout';
 import Dashboard from './pages/Dashboard';
 import Roster from './pages/Roster';
@@ -18,7 +18,7 @@ export default function App() {
     <GameProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<StartPage />} />
+          <Route path="/" element={<StartGame />} />
           <Route element={<GameLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/roster" element={<Roster />} />
