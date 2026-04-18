@@ -4,6 +4,8 @@ import { generatePlayerGameStats } from '../data/playerStatsHelpers';
 
 const GameContext = createContext(null);
 
+const TOTAL_SALARY_CAP = 120_000_000; // $120M cap
+
 function random() {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     const arr = new Uint32Array(1);
@@ -17,7 +19,6 @@ function random() {
   throw new Error('Secure randomness is unavailable in this environment.');
 }
 
-// Helper to parse date string "Oct 15" to comparable format
 function parseDate(dateStr) {
   const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
   const [month, day] = dateStr.split(' ');
@@ -25,8 +26,36 @@ function parseDate(dateStr) {
   return monthIndex * 100 + parseInt(day);
 }
 
+function calculateAvailableCap(roster) {
+  const usedCap = roster.reduce((sum, player) => sum + player.salary, 0);
+  return Math.max(0, TOTAL_SALARY_CAP - usedCap);
+}
+
+function playBuzzer() {
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.1);
+  } catch (e) {
+    // Audio not available
+  }
+}
+
 export function GameProvider({ children }) {
   const [gameState, setGameState] = useState(null);
+  const [gameAnimation, setGameAnimation] = useState(null);
 
   const startGame = useCallback((teamId, gmName) => {
     const team = NBA_TEAMS.find(t => t.id === teamId);
@@ -38,7 +67,6 @@ export function GameProvider({ children }) {
       allSchedules[t.id] = generateSchedule(t.id);
     });
 
-    // Initialize player stats
     const playerStats = {};
     NBA_TEAMS.forEach(t => {
       allRosters[t.id].forEach(player => {
@@ -49,20 +77,22 @@ export function GameProvider({ children }) {
           totalAssists: 0,
           totalSteals: 0,
           totalBlocks: 0,
-          gameLog: [], // Array of game stats
+          gameLog: [],
         };
       });
     });
+
+    const initialRoster = allRosters[teamId];
 
     setGameState({
       team,
       gmName,
       season: 2025,
       week: 1,
-      budget: 150_000_000,
+      budget: calculateAvailableCap(initialRoster),
       wins: 0,
       losses: 0,
-      roster: allRosters[teamId],
+      roster: initialRoster,
       schedule: allSchedules[teamId],
       allSchedules,
       draftPicks: generateDraftPicks(teamId),
@@ -82,12 +112,29 @@ export function GameProvider({ children }) {
   const signFreeAgent = useCallback((player) => {
     setGameState(prev => {
       if (!prev) return prev;
+      const newRoster = [...prev.roster, { ...player, teamId: prev.team.id }];
       const newNotif = { id: Date.now(), type: 'success', text: `Signed ${player.firstName} ${player.lastName} to a ${player.yearsLeft}-year deal.`, read: false };
+      
+      // Initialize stats for new player
+      const newPlayerStats = { ...prev.playerStats };
+      if (!newPlayerStats[player.id]) {
+        newPlayerStats[player.id] = {
+          gamesPlayed: 0,
+          totalPoints: 0,
+          totalRebounds: 0,
+          totalAssists: 0,
+          totalSteals: 0,
+          totalBlocks: 0,
+          gameLog: [],
+        };
+      }
+
       return {
         ...prev,
-        roster: [...prev.roster, { ...player, teamId: prev.team.id }],
+        roster: newRoster,
         freeAgents: prev.freeAgents.filter(p => p.id !== player.id),
-        budget: prev.budget - player.salary,
+        budget: calculateAvailableCap(newRoster),
+        playerStats: newPlayerStats,
         notifications: [newNotif, ...prev.notifications],
       };
     });
@@ -98,11 +145,12 @@ export function GameProvider({ children }) {
       if (!prev) return prev;
       const player = prev.roster.find(p => p.id === playerId);
       if (!player) return prev;
+      const newRoster = prev.roster.filter(p => p.id !== playerId);
       const newNotif = { id: Date.now(), type: 'warning', text: `Released ${player.firstName} ${player.lastName}.`, read: false };
       return {
         ...prev,
-        roster: prev.roster.filter(p => p.id !== playerId),
-        budget: prev.budget + Math.round(player.salary * 0.3),
+        roster: newRoster,
+        budget: calculateAvailableCap(newRoster),
         notifications: [newNotif, ...prev.notifications],
       };
     });
@@ -115,60 +163,40 @@ export function GameProvider({ children }) {
     });
   }, []);
 
-  const playBuzzer = () => {
-    // Create a simple buzzer sound using Web Audio API
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.value = 800;
-      oscillator.type = 'sine';
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.1);
-    } catch (e) {
-      // Audio context not available, skip
-    }
-  };
-
   const simulateGame = useCallback(() => {
     setGameState(prev => {
       if (!prev) return prev;
       
-      // Find next unplayed game by date order for YOUR team
       const unplayedGames = prev.schedule.filter(g => !g.played);
       if (!unplayedGames.length) return prev;
       
       const nextGame = unplayedGames.sort((a, b) => parseDate(a.date) - parseDate(b.date))[0];
       
-      // Simulate YOUR game with team ratings
+      // Show animation
+      setGameAnimation({ 
+        game: nextGame, 
+        progress: 1, 
+        total: unplayedGames.length 
+      });
+
       const yourTeam = prev.team;
       const opponent = NBA_TEAMS.find(t => t.abbr === nextGame.opponent);
       
-      // Home court advantage: +3 rating points
       const adjustedRating = yourTeam.rating + (nextGame.isHome ? 3 : -3);
       const adjustedOppRating = opponent.rating - (nextGame.isHome ? 3 : -3);
       
-      // Calculate win probability
       const totalRating = adjustedRating + adjustedOppRating;
       const winProbability = adjustedRating / totalRating;
       
-      // Add randomness
       const won = random() < winProbability;
       const score = { us: won ? 108 + Math.floor(random() * 15) : 95 + Math.floor(random() * 15), them: 0 };
       score.them = won ? score.us - 5 - Math.floor(random() * 15) : score.us + 5 + Math.floor(random() * 15);
       
-      // Generate player stats for your team
+      // Generate player stats
       const newPlayerStats = { ...prev.playerStats };
+      
       prev.roster.forEach(player => {
-        const isStarter = prev.roster.indexOf(player) < 5; // First 5 are starters
+        const isStarter = prev.roster.indexOf(player) < 5;
         const gameStats = generatePlayerGameStats(player, isStarter, won);
         
         if (!newPlayerStats[player.id]) {
@@ -192,7 +220,6 @@ export function GameProvider({ children }) {
         newPlayerStats[player.id].gameLog.push(gameStats);
       });
       
-      // Do the same for opponent
       const oppRoster = prev.allRosters[opponent.id];
       oppRoster.forEach(player => {
         const isStarter = oppRoster.indexOf(player) < 5;
@@ -222,11 +249,9 @@ export function GameProvider({ children }) {
       const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
       const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
       
-      // Update YOUR schedule in allSchedules
       const newAllSchedules = { ...prev.allSchedules };
       newAllSchedules[prev.team.id] = prev.schedule.map(g => g.id === nextGame.id ? { ...g, played: true, won, score } : g);
       
-      // Also simulate OTHER teams' unplayed games on the same day
       const gameDate = nextGame.date;
       
       NBA_TEAMS.forEach(team => {
@@ -252,7 +277,6 @@ export function GameProvider({ children }) {
             };
             teamScore.them = teamWon ? teamScore.us - 5 - Math.floor(random() * 15) : teamScore.us + 5 + Math.floor(random() * 15);
             
-            // Update the schedule for this team
             newAllSchedules[team.id] = teamSchedule.map(g => 
               g.id === game.id ? { ...g, played: true, won: teamWon, score: teamScore } : g
             );
@@ -262,8 +286,10 @@ export function GameProvider({ children }) {
       
       const newSchedule = newAllSchedules[prev.team.id];
       
-      // Play buzzer sound
       playBuzzer();
+      
+      // Hide animation after 800ms
+      setTimeout(() => setGameAnimation(null), 800);
       
       return {
         ...prev,
@@ -310,6 +336,7 @@ export function GameProvider({ children }) {
       return {
         ...prev,
         roster: newRoster,
+        budget: calculateAvailableCap(newRoster),
         allRosters: newAllRosters,
         tradeHistory: newTradeHistory,
         notifications: [newNotif, ...prev.notifications],
@@ -326,7 +353,7 @@ export function GameProvider({ children }) {
   }, []);
 
   return (
-    <GameContext.Provider value={{ gameState, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade }}>
+    <GameContext.Provider value={{ gameState, gameAnimation, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade }}>
       {children}
     </GameContext.Provider>
   );
