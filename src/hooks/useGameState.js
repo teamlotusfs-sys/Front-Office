@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generatePlayerGameStats } from '../data/playerStatsHelpers';
 
@@ -27,7 +27,6 @@ function parseDate(dateStr) {
 
 export function GameProvider({ children }) {
   const [gameState, setGameState] = useState(null);
-  const [simAnimation, setSimAnimation] = useState(null); // { game, progress, total }
 
   const startGame = useCallback((teamId, gmName) => {
     const team = NBA_TEAMS.find(t => t.id === teamId);
@@ -327,7 +326,7 @@ export function GameProvider({ children }) {
   }, []);
 
   return (
-    <GameContext.Provider value={{ gameState, simAnimation, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade }}>
+    <GameContext.Provider value={{ gameState, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade }}>
       {children}
     </GameContext.Provider>
   );
