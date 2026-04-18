@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 
 const GameContext = createContext(null);
@@ -127,9 +127,12 @@ export function GameProvider({ children }) {
       const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
       const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
       
+      // Update YOUR schedule in allSchedules
+      const newAllSchedules = { ...prev.allSchedules };
+      newAllSchedules[prev.team.id] = prev.schedule.map(g => g.id === nextGame.id ? { ...g, played: true, won, score } : g);
+      
       // Also simulate OTHER teams' unplayed games on the same day
       const gameDate = nextGame.date;
-      const newAllSchedules = { ...prev.allSchedules };
       
       NBA_TEAMS.forEach(team => {
         if (team.id !== prev.team.id) {
@@ -162,12 +165,14 @@ export function GameProvider({ children }) {
         }
       });
       
+      const newSchedule = newAllSchedules[prev.team.id];
+      
       return {
         ...prev,
         wins: won ? prev.wins + 1 : prev.wins,
         losses: !won ? prev.losses + 1 : prev.losses,
         week: prev.week + 1,
-        schedule: prev.schedule.map(g => g.id === nextGame.id ? { ...g, played: true, won, score } : g),
+        schedule: newSchedule,
         allSchedules: newAllSchedules,
         notifications: [newNotif, ...prev.notifications],
       };
