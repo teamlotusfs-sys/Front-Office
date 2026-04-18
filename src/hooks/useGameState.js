@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
+import { generatePlayerGameStats } from '../data/playerStatsHelpers';
 
 const GameContext = createContext(null);
 
@@ -26,6 +27,7 @@ function parseDate(dateStr) {
 
 export function GameProvider({ children }) {
   const [gameState, setGameState] = useState(null);
+  const [simAnimation, setSimAnimation] = useState(null); // { game, progress, total }
 
   const startGame = useCallback((teamId, gmName) => {
     const team = NBA_TEAMS.find(t => t.id === teamId);
@@ -35,6 +37,22 @@ export function GameProvider({ children }) {
     NBA_TEAMS.forEach(t => { 
       allRosters[t.id] = generateRoster(t.id);
       allSchedules[t.id] = generateSchedule(t.id);
+    });
+
+    // Initialize player stats
+    const playerStats = {};
+    NBA_TEAMS.forEach(t => {
+      allRosters[t.id].forEach(player => {
+        playerStats[player.id] = {
+          gamesPlayed: 0,
+          totalPoints: 0,
+          totalRebounds: 0,
+          totalAssists: 0,
+          totalSteals: 0,
+          totalBlocks: 0,
+          gameLog: [], // Array of game stats
+        };
+      });
     });
 
     setGameState({
@@ -51,6 +69,7 @@ export function GameProvider({ children }) {
       draftPicks: generateDraftPicks(teamId),
       freeAgents: generateFreeAgents(40),
       allRosters,
+      playerStats,
       tradeHistory: [],
       notifications: [
         { id: 1, type: 'info', text: `Welcome, GM ${gmName}! The ${team.name} rebuild starts now.`, read: false },
@@ -97,6 +116,29 @@ export function GameProvider({ children }) {
     });
   }, []);
 
+  const playBuzzer = () => {
+    // Create a simple buzzer sound using Web Audio API
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.value = 800;
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    } catch (e) {
+      // Audio context not available, skip
+    }
+  };
+
   const simulateGame = useCallback(() => {
     setGameState(prev => {
       if (!prev) return prev;
@@ -119,10 +161,64 @@ export function GameProvider({ children }) {
       const totalRating = adjustedRating + adjustedOppRating;
       const winProbability = adjustedRating / totalRating;
       
-      // Add randomness - better teams win more but upsets still possible
+      // Add randomness
       const won = random() < winProbability;
       const score = { us: won ? 108 + Math.floor(random() * 15) : 95 + Math.floor(random() * 15), them: 0 };
       score.them = won ? score.us - 5 - Math.floor(random() * 15) : score.us + 5 + Math.floor(random() * 15);
+      
+      // Generate player stats for your team
+      const newPlayerStats = { ...prev.playerStats };
+      prev.roster.forEach(player => {
+        const isStarter = prev.roster.indexOf(player) < 5; // First 5 are starters
+        const gameStats = generatePlayerGameStats(player, isStarter, won);
+        
+        if (!newPlayerStats[player.id]) {
+          newPlayerStats[player.id] = {
+            gamesPlayed: 0,
+            totalPoints: 0,
+            totalRebounds: 0,
+            totalAssists: 0,
+            totalSteals: 0,
+            totalBlocks: 0,
+            gameLog: [],
+          };
+        }
+        
+        newPlayerStats[player.id].gamesPlayed++;
+        newPlayerStats[player.id].totalPoints += gameStats.points;
+        newPlayerStats[player.id].totalRebounds += gameStats.rebounds;
+        newPlayerStats[player.id].totalAssists += gameStats.assists;
+        newPlayerStats[player.id].totalSteals += gameStats.steals;
+        newPlayerStats[player.id].totalBlocks += gameStats.blocks;
+        newPlayerStats[player.id].gameLog.push(gameStats);
+      });
+      
+      // Do the same for opponent
+      const oppRoster = prev.allRosters[opponent.id];
+      oppRoster.forEach(player => {
+        const isStarter = oppRoster.indexOf(player) < 5;
+        const gameStats = generatePlayerGameStats(player, isStarter, !won);
+        
+        if (!newPlayerStats[player.id]) {
+          newPlayerStats[player.id] = {
+            gamesPlayed: 0,
+            totalPoints: 0,
+            totalRebounds: 0,
+            totalAssists: 0,
+            totalSteals: 0,
+            totalBlocks: 0,
+            gameLog: [],
+          };
+        }
+        
+        newPlayerStats[player.id].gamesPlayed++;
+        newPlayerStats[player.id].totalPoints += gameStats.points;
+        newPlayerStats[player.id].totalRebounds += gameStats.rebounds;
+        newPlayerStats[player.id].totalAssists += gameStats.assists;
+        newPlayerStats[player.id].totalSteals += gameStats.steals;
+        newPlayerStats[player.id].totalBlocks += gameStats.blocks;
+        newPlayerStats[player.id].gameLog.push(gameStats);
+      });
       
       const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
       const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
@@ -167,6 +263,9 @@ export function GameProvider({ children }) {
       
       const newSchedule = newAllSchedules[prev.team.id];
       
+      // Play buzzer sound
+      playBuzzer();
+      
       return {
         ...prev,
         wins: won ? prev.wins + 1 : prev.wins,
@@ -174,6 +273,7 @@ export function GameProvider({ children }) {
         week: prev.week + 1,
         schedule: newSchedule,
         allSchedules: newAllSchedules,
+        playerStats: newPlayerStats,
         notifications: [newNotif, ...prev.notifications],
       };
     });
@@ -187,11 +287,9 @@ export function GameProvider({ children }) {
       const theirPlayers = trade.theirPlayers;
       const theirTeam = trade.from;
       
-      // Remove your players, add their players
       let newRoster = prev.roster.filter(p => !yourPlayers.find(tp => tp.id === p.id));
       newRoster = [...newRoster, ...theirPlayers.map(p => ({ ...p, teamId: prev.team.id }))];
       
-      // Update all rosters
       const newAllRosters = { ...prev.allRosters };
       newAllRosters[prev.team.id] = newRoster;
       newAllRosters[theirTeam.id] = prev.allRosters[theirTeam.id]
@@ -229,7 +327,7 @@ export function GameProvider({ children }) {
   }, []);
 
   return (
-    <GameContext.Provider value={{ gameState, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade }}>
+    <GameContext.Provider value={{ gameState, simAnimation, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade }}>
       {children}
     </GameContext.Provider>
   );
