@@ -4,33 +4,29 @@ import { NBA_TEAMS } from '../data/nbaData';
 
 export default function Standings() {
   const { gameState } = useGame();
-  const { team, wins, losses, schedule } = gameState;
+  const { team, wins, losses, allSchedules } = gameState;
   const [conf, setConf] = useState('All');
 
-  // Calculate wins/losses for all teams from their rosters in schedule
+  // Calculate wins/losses for ALL teams from their schedules
   const teamRecords = {};
   NBA_TEAMS.forEach(t => {
     teamRecords[t.id] = { w: 0, l: 0 };
   });
 
-  // Count played games
-  schedule.forEach(g => {
-    const opponent = NBA_TEAMS.find(t => t.abbr === g.opponent);
-    if (g.played && opponent) {
-      if (g.won) {
-        // Your team won
-        teamRecords[team.id].w++;
-        teamRecords[opponent.id].l++;
-      } else {
-        // Your team lost
-        teamRecords[team.id].l++;
-        teamRecords[opponent.id].w++;
-      }
+  // Count played games from ALL teams' schedules
+  NBA_TEAMS.forEach(t => {
+    if (allSchedules[t.id]) {
+      allSchedules[t.id].forEach(g => {
+        if (g.played) {
+          if (g.won) {
+            teamRecords[t.id].w++;
+          } else {
+            teamRecords[t.id].l++;
+          }
+        }
+      });
     }
   });
-
-  // Override your team with actual state
-  teamRecords[team.id] = { w: wins, l: losses };
 
   // Build standings
   const allStandings = NBA_TEAMS.map(t => ({
