@@ -50,120 +50,151 @@ export default function PhonePopup({ offer, onAnswer, onDecline }) {
       
       {/* Phone Device */}
       <div style={{
-        background: '#000',
-        borderRadius: 40,
-        padding: '12px',
-        width: 360,
-        boxShadow: '0 20px 60px rgba(0,0,0,0.6), inset 0 0 30px rgba(255,255,255,0.1)',
-        border: '8px solid #111',
+        background: 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)',
+        borderRadius: 50,
+        padding: '14px',
+        width: 380,
+        boxShadow: '0 30px 80px rgba(0,0,0,0.8), inset 0 0 40px rgba(232,255,71,0.05)',
+        border: '12px solid #0a0a0f',
         animation: isRinging ? 'ring 0.3s ease-in-out infinite' : 'none',
+        position: 'relative',
       }}>
-        {/* Notch */}
-        <div style={{
-          background: '#000',
-          height: 30,
-          borderRadius: '0 0 30px 30px',
-          marginBottom: 8,
-          position: 'relative',
-          zIndex: 10,
-        }} />
-
         {/* Screen */}
         <div style={{
-          background: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)',
-          borderRadius: 32,
-          padding: '40px 20px',
+          background: 'linear-gradient(135deg, #0a0a0f 0%, #141420 100%)',
+          borderRadius: 40,
+          padding: '0',
           aspectRatio: '9/16',
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          textAlign: 'center',
-          minHeight: 650,
-          boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8)',
+          minHeight: 700,
+          boxShadow: 'inset 0 1px 3px rgba(255,255,255,0.1)',
           position: 'relative',
           overflow: 'hidden',
         }}>
-          {/* Top status bar */}
+          {/* Notch */}
           <div style={{
-            position: 'absolute',
-            top: 20,
-            left: 0,
-            right: 0,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingX: 20,
-            fontSize: 12,
-            color: '#888',
-          }}>
-            <span>🏀</span>
-            <span>{formatTime(elapsed)}</span>
-            <span>📡</span>
-          </div>
+            background: '#000',
+            height: 28,
+            borderRadius: '0 0 25px 25px',
+            position: 'relative',
+            zIndex: 10,
+          }} />
 
-          {/* Team Avatar */}
+          {/* Content */}
           <div style={{
-            marginTop: 40,
+            flex: 1,
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
+            padding: '20px',
+            overflowY: 'auto',
             gap: 16,
           }}>
+            {/* Status bar */}
             <div style={{
-              width: 100,
-              height: 100,
-              borderRadius: '50%',
-              background: team.color,
               display: 'flex',
+              justifyContent: 'space-between',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 50,
-              color: '#fff',
-              fontWeight: 700,
-              boxShadow: `0 10px 30px ${team.color}80`,
-              animation: isRinging ? 'pulse 1.5s infinite' : 'none',
+              fontSize: 12,
+              color: '#888',
+              paddingBottom: 8,
+              borderBottom: '1px solid rgba(232,255,71,0.1)',
             }}>
-              {team.abbr}
+              <span>🏀</span>
+              <span>{formatTime(elapsed)}</span>
+              <span>📡</span>
             </div>
-            
-            <div>
-              <div style={{
-                fontSize: 20,
-                fontWeight: 700,
-                color: '#fff',
-                marginBottom: 4,
-              }}>
-                {team.name}
-              </div>
-              <div style={{
-                fontSize: 14,
-                color: '#888',
-              }}>
-                {isRinging ? 'Incoming call...' : 'Connected'}
-              </div>
-            </div>
-          </div>
 
-          {/* Call info */}
-          <div style={{
-            fontSize: 13,
-            color: '#aaa',
-            marginTop: 20,
-          }}>
-            <div>GM wants to discuss a trade</div>
-            <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
-              {offer.yourPlayers?.length} player{offer.yourPlayers?.length !== 1 ? 's' : ''} for {offer.theirPlayers?.length}
+            {/* Team Avatar */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              marginBottom: 8,
+            }}>
+              <div style={{
+                width: 90,
+                height: 90,
+                borderRadius: '50%',
+                background: team.color,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 45,
+                color: '#fff',
+                fontWeight: 700,
+                boxShadow: `0 10px 30px ${team.color}80`,
+                animation: isRinging ? 'pulse 1.5s infinite' : 'none',
+              }}>
+                {team.emoji}
+              </div>
+              
+              <div style={{ textAlign: 'center' }}>
+                <div style={{
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: '#fff',
+                  marginBottom: 2,
+                }}>
+                  {team.name}
+                </div>
+                <div style={{
+                  fontSize: 13,
+                  color: '#888',
+                }}>
+                  {isRinging ? 'Incoming call...' : 'Connected'}
+                </div>
+              </div>
+            </div>
+
+            {/* Trade Details */}
+            <div style={{
+              background: 'rgba(232, 255, 71, 0.05)',
+              border: '1px solid rgba(232, 255, 71, 0.2)',
+              borderRadius: 12,
+              padding: 12,
+              fontSize: 12,
+            }}>
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ color: '#e8ff47', fontWeight: 600, marginBottom: 4 }}>They Offer:</div>
+                {offer.theirPlayers?.map(p => (
+                  <div key={p.id} style={{ color: '#aaa', marginBottom: 2, fontSize: 11 }}>
+                    • {p.firstName} {p.lastName} ({p.ovr} OVR)
+                  </div>
+                ))}
+              </div>
+              <div style={{ borderTop: '1px solid rgba(232, 255, 71, 0.1)', paddingTop: 8 }}>
+                <div style={{ color: '#e8ff47', fontWeight: 600, marginBottom: 4 }}>You Give:</div>
+                {offer.yourPlayers?.map(p => (
+                  <div key={p.id} style={{ color: '#aaa', marginBottom: 2, fontSize: 11 }}>
+                    • {p.firstName} {p.lastName} ({p.ovr} OVR)
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Evaluation message */}
+            <div style={{
+              background: 'rgba(232, 255, 71, 0.08)',
+              borderLeft: '3px solid #e8ff47',
+              padding: '10px 12px',
+              borderRadius: 4,
+              fontSize: 12,
+              color: '#e8ff47',
+              fontWeight: 500,
+            }}>
+              "{offer.message}"
             </div>
           </div>
 
           {/* Buttons Container */}
           <div style={{
             display: 'flex',
-            gap: 20,
-            width: '100%',
-            marginTop: 20,
+            gap: 16,
+            padding: '16px 20px 24px',
             justifyContent: 'center',
+            borderTop: '1px solid rgba(232,255,71,0.1)',
           }}>
             {/* Decline Button */}
             <button
@@ -181,10 +212,11 @@ export default function PhonePopup({ offer, onAnswer, onDecline }) {
                 fontSize: 32,
                 transition: 'all 0.2s',
                 boxShadow: '0 4px 15px rgba(255, 59, 48, 0.4)',
+                fontWeight: 700,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.1)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(255, 59, 48, 0.6)';
+                e.currentTarget.style.transform = 'scale(1.15)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(255, 59, 48, 0.6)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
@@ -211,10 +243,11 @@ export default function PhonePopup({ offer, onAnswer, onDecline }) {
                 fontSize: 32,
                 transition: 'all 0.2s',
                 boxShadow: '0 4px 15px rgba(52, 199, 89, 0.4)',
+                fontWeight: 700,
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.1)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(52, 199, 89, 0.6)';
+                e.currentTarget.style.transform = 'scale(1.15)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(52, 199, 89, 0.6)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
