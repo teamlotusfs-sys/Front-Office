@@ -62,8 +62,7 @@ export default function Trades() {
   );
 
   const theirTeamRoster = selectedTeam ? allRosters[selectedTeam.id] : [];
-  const theirTeamPicks = selectedTeam ? 
-    draftPicks.filter(p => p.from === selectedTeam.id) : [];
+  const theirTeamPicks = selectedTeam ? draftPicks.filter(p => p.from === selectedTeam.id) : [];
   const yourTeamPicks = draftPicks.filter(p => p.from === team.id);
 
   const yourSalary = roster.filter(p => selectedYourPlayers.includes(p.id)).reduce((sum, p) => sum + p.salary, 0);
@@ -79,7 +78,6 @@ export default function Trades() {
       <h1 className="page-title">Trade Center</h1>
       <p className="page-subtitle">Build your perfect roster through strategic trades</p>
 
-      {/* Tabs */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         {[
           { id: 'propose', label: '✉️ Propose Trade' },
@@ -106,11 +104,186 @@ export default function Trades() {
         ))}
       </div>
 
-      {/* Tab Content */}
       <div style={{ display: activeTab === 'propose' ? 'block' : 'none' }}>
         {activeConversation ? (
           <div style={{ maxWidth: 700 }}>
             <TradeConversation
               trade={activeConversation}
-              *
-
+              onAccept={handleAcceptTrade}
+              onDecline={handleDeclineTrade}
+              isIncoming={false}
+            />
+          </div>
+        ) : (
+          <>
+            <div className="trade-builder">
+              <div className="trade-column trade-column-teams">
+                <div className="trade-column-header">
+                  <h3>🏀 Trade Partner</h3>
+                </div>
+                <input
+                  placeholder="Search teams..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="trade-search"
+                />
+                <div className="trade-team-list">
+                  {filteredTeams.map(t => (
+                    <button
+                      key={t.id}
+                      onClick={() => {
+                        setSelectedTeam(t);
+                        setSelectedTheirPlayers([]);
+                        setSelectedTheirPicks([]);
+                      }}
+                      className={`trade-team-btn ${selectedTeam?.id === t.id ? 'active' : ''}`}
+                    >
+                      <div className="trade-team-dot" style={{ background: t.color }} />
+                      <div>
+                        <div className="trade-team-abbr">{t.abbr}</div>
+                        <div className="trade-team-name">{t.name}</div>
+                      </div>
+                      <div className="trade-team-rating">{t.rating}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="trade-column">
+                <div className="trade-column-header">
+                  <h3>😊 Your Assets</h3>
+                  <div className="trade-salary-info">
+                    {formatSalary(yourSalary)}
+                  </div>
+                </div>
+                
+                <div className="trade-assets">
+                  <div className="trade-asset-section">
+                    <div className="trade-asset-label">Picks ({selectedYourPicks.length})</div>
+                    <div className="trade-picks-row">
+                      {yourTeamPicks.map(p => (
+                        <button
+                          key={p.id}
+                          onClick={() => setSelectedYourPicks(prev =>
+                            prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                          )}
+                          className={`trade-pick-card ${selectedYourPicks.includes(p.id) ? 'selected' : ''}`}
+                        >
+                          <div className="pick-round">R{p.round}</div>
+                          <div className="pick-year">{p.year}</div>
+                          {p.protectionType && <div className="pick-protection">{p.protectionType}</div>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="trade-asset-section">
+                    <div className="trade-asset-label">Players ({selectedYourPlayers.length})</div>
+                    <div className="trade-player-grid">
+                      {sortedYourRoster.map(p => (
+                        <button
+                          key={p.id}
+                          onClick={() => setSelectedYourPlayers(prev =>
+                            prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                          )}
+                          className={`trade-player-card ${selectedYourPlayers.includes(p.id) ? 'selected' : ''}`}
+                        >
+                          <div className="player-name">
+                            {p.firstName} {p.lastName}
+                          </div>
+                          <div className="player-stats">
+                            <span className="player-ovr">{p.ovr}</span>
+                            <span className="player-pos">{p.pos}</span>
+                          </div>
+                          <div className="player-salary">{formatSalary(p.salary)}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {selectedTeam && (
+                <div className="trade-column">
+                  <div className="trade-column-header">
+                    <h3>🏆 {selectedTeam.abbr} Assets</h3>
+                    <div className="trade-salary-info">
+                      {formatSalary(theirSalary)}
+                    </div>
+                  </div>
+
+                  <div className="trade-assets">
+                    <div className="trade-asset-section">
+                      <div className="trade-asset-label">Picks ({selectedTheirPicks.length})</div>
+                      <div className="trade-picks-row">
+                        {theirTeamPicks.map(p => (
+                          <button
+                            key={p.id}
+                            onClick={() => setSelectedTheirPicks(prev =>
+                              prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                            )}
+                            className={`trade-pick-card ${selectedTheirPicks.includes(p.id) ? 'selected' : ''}`}
+                          >
+                            <div className="pick-round">R{p.round}</div>
+                            <div className="pick-year">{p.year}</div>
+                            {p.protectionType && <div className="pick-protection">{p.protectionType}</div>}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="trade-asset-section">
+                      <div className="trade-asset-label">Players ({selectedTheirPlayers.length})</div>
+                      <div className="trade-player-grid">
+                        {sortedTheirRoster.map(p => (
+                          <button
+                            key={p.id}
+                            onClick={() => setSelectedTheirPlayers(prev =>
+                              prev.includes(p.id) ? prev.filter(id => id !== p.id) : [...prev, p.id]
+                            )}
+                            className={`trade-player-card ${selectedTheirPlayers.includes(p.id) ? 'selected' : ''}`}
+                          >
+                            <div className="player-name">
+                              {p.firstName} {p.lastName}
+                            </div>
+                            <div className="player-stats">
+                              <span className="player-ovr">{p.ovr}</span>
+                              <span className="player-pos">{p.pos}</span>
+                            </div>
+                            <div className="player-salary">{formatSalary(p.salary)}</div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {selectedTeam && (
+              <button
+                onClick={handleProposeTradeClick}
+                disabled={!canPropose}
+                className="trade-propose-btn"
+              >
+                Propose Trade to {selectedTeam.abbr}
+              </button>
+            )}
+          </>
+        )}
+      </div>
+
+      <div style={{ display: activeTab === 'offers' ? 'block' : 'none' }}>
+        <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px 20px' }}>
+          No trade offers yet. GMs will call you with offers during the season.
+        </div>
+      </div>
+
+      <div style={{ display: activeTab === 'history' ? 'block' : 'none' }}>
+        <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px 20px' }}>
+          No trades completed yet.
+        </div>
+      </div>
+    </div>
+  );
+}
