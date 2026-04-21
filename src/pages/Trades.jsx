@@ -264,7 +264,32 @@ export default function Trades() {
               <button
                 onClick={handleProposeTradeClick}
                 disabled={!canPropose}
-                className="trade-propose-btn"
+                style={{
+                  width: '100%',
+                  padding: '16px 24px',
+                  marginTop: '24px',
+                  background: canPropose ? 'linear-gradient(135deg, var(--accent), var(--green))' : 'var(--bg-hover)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: canPropose ? '#0a0a0f' : 'var(--text-secondary)',
+                  fontSize: '14px',
+                  fontWeight: '700',
+                  cursor: canPropose ? 'pointer' : 'not-allowed',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px',
+                  fontFamily: 'Outfit, sans-serif',
+                  transition: 'all 0.3s',
+                }}
+                onMouseEnter={(e) => {
+                  if (canPropose) {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 10px 30px rgba(232, 255, 71, 0.3)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'none';
+                }}
               >
                 Propose Trade to {selectedTeam.abbr}
               </button>
