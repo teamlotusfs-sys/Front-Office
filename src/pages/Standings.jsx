@@ -1,38 +1,20 @@
 import React, { useState } from 'react';
 import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
+import './Standings.css';
 
 export default function Standings() {
   const { gameState } = useGame();
-  const { team, allSchedules } = gameState;
+  const { team, teamRecords } = gameState;
   const [conf, setConf] = useState('All');
 
-  // Calculate wins/losses for ALL teams from their schedules
-  const teamRecords = {};
-  NBA_TEAMS.forEach(t => {
-    teamRecords[t.id] = { w: 0, l: 0 };
-  });
-
-  // Count played games from ALL teams' schedules
-  NBA_TEAMS.forEach(t => {
-    if (allSchedules[t.id]) {
-      allSchedules[t.id].forEach(g => {
-        if (g.played) {
-          if (g.won) {
-            teamRecords[t.id].w++;
-          } else {
-            teamRecords[t.id].l++;
-          }
-        }
-      });
-    }
-  });
-
-  // Build standings
+  // Build standings from team records
   const allStandings = NBA_TEAMS.map(t => ({
     ...t,
     w: teamRecords[t.id].w,
     l: teamRecords[t.id].l,
+    pf: teamRecords[t.id].pf,
+    pa: teamRecords[t.id].pa,
   }));
 
   // Filter by conference
@@ -42,7 +24,9 @@ export default function Standings() {
   const sorted = filtered.sort((a, b) => {
     const pctA = a.w / (a.w + a.l) || 0;
     const pctB = b.w / (b.w + b.l) || 0;
-    return pctB - pctA;
+    if (pctB !== pctA) return pctB - pctA;
+    // Tiebreaker: head to head, then point differential
+    return (b.pf - b.pa) - (a.pf - a.pa);
   });
 
   // Add rank and games behind
@@ -53,7 +37,13 @@ export default function Standings() {
     const gb = leaderWins === t.w && leaderLosses === t.l 
       ? '—' 
       : ((leaderWins - t.w) + (t.l - leaderLosses)) / 2;
-    return { ...t, rank: i + 1, gb: typeof gb === 'number' ? gb.toFixed(1) : gb };
+    return { 
+      ...t, 
+      rank: i + 1, 
+      gb: typeof gb === 'number' ? gb.toFixed(1) : gb,
+      pct: t.w + t.l > 0 ? (t.w / (t.w + t.l)).toFixed(3) : '.000',
+      diff: t.pf - t.pa,
+    };
   });
 
   return (
@@ -74,7 +64,8 @@ export default function Standings() {
               padding: '7px 14px',
               fontSize: 12,
               cursor: 'pointer',
-              transition: 'all 0.15s'
+              transition: 'all 0.15s',
+              fontWeight: 600,
             }}
           >
             {c === 'All' ? 'All Teams' : `${c}ern Conference`}
@@ -86,13 +77,21 @@ export default function Standings() {
         <table>
           <thead>
             <tr>
-              <th>#</th><th>Team</th><th>Conf</th><th>W</th><th>L</th><th>PCT</th><th>GB</th><th>OVR</th>
+              <th>#</th>
+              <th>Team</th>
+              <th>W</th>
+              <th>L</th>
+              <th>PCT</th>
+              <th>GB</th>
+              <th>PF</th>
+              <th>PA</th>
+              <th>DIFF</th>
+              <th>OVR</th>
             </tr>
           </thead>
           <tbody>
             {standings.map(t => {
               const isMyTeam = t.id === team.id;
-              const pct = t.w + t.l > 0 ? (t.w / (t.w + t.l)).toFixed(3) : '.000';
               const isPlayoff = t.rank <= (conf === 'All' ? 16 : 8);
 
               return (
@@ -100,7 +99,7 @@ export default function Standings() {
                   key={t.id}
                   style={isMyTeam ? { background: 'rgba(232,255,71,0.08)', outline: '1px solid var(--accent)', outlineOffset: '-1px' } : {}}
                 >
-                  <td className="mono muted" style={{ fontSize: 13 }}>
+                  <td className="mono muted" style={{ fontSize: 13, fontWeight: 700 }}>
                     {isPlayoff && <span style={{ color: 'var(--green)', marginRight: 4, fontSize: 10 }}>●</span>}
                     {t.rank}
                   </td>
@@ -109,23 +108,27 @@ export default function Standings() {
                       <div style={{ width: 10, height: 10, borderRadius: '50%', background: t.color, flexShrink: 0 }} />
                       <span style={{ fontWeight: isMyTeam ? 700 : 400, color: isMyTeam ? 'var(--accent)' : 'inherit' }}>
                         {t.abbr}
-                        {isMyTeam && <span style={{ fontSize: 10, marginLeft: 6, color: 'var(--accent)', fontFamily: 'DM Mono, monospace' }}>YOU</span>}
+                        {isMyTeam && <span style={{ fontSize: 10, marginLeft: 6, color: 'var(--accent)', fontFamily: 'Space Mono, monospace' }}>YOU</span>}
                       </span>
                     </div>
                   </td>
-                  <td><span className="badge badge-muted">{t.conf}</span></td>
-                  <td style={{ fontWeight: 600, color: 'var(--green)', fontFamily: 'DM Mono, monospace' }}>{t.w}</td>
-                  <td style={{ fontWeight: 600, color: 'var(--red)', fontFamily: 'DM Mono, monospace' }}>{t.l}</td>
-                  <td className="mono">{pct}</td>
-                  <td className="mono muted">{t.gb}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--green)', fontFamily: 'Space Mono, monospace' }}>{t.w}</td>
+                  <td style={{ fontWeight: 600, color: 'var(--red)', fontFamily: 'Space Mono, monospace' }}>{t.l}</td>
+                  <td className="mono" style={{ fontSize: 12, fontWeight: 600 }}>{t.pct}</td>
+                  <td className="mono muted" style={{ fontSize: 12 }}>{t.gb}</td>
+                  <td className="mono" style={{ fontSize: 12, fontFamily: 'Space Mono, monospace' }}>{t.pf}</td>
+                  <td className="mono" style={{ fontSize: 12, fontFamily: 'Space Mono, monospace' }}>{t.pa}</td>
+                  <td className="mono" style={{ fontSize: 12, fontWeight: 600, color: t.diff > 0 ? 'var(--green)' : t.diff < 0 ? 'var(--red)' : 'var(--text-secondary)', fontFamily: 'Space Mono, monospace' }}>
+                    {t.diff > 0 ? '+' : ''}{t.diff}
+                  </td>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ height: 4, width: 50, background: 'var(--bg-hover)', borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ height: 4, width: 40, background: 'var(--bg-hover)', borderRadius: 2, overflow: 'hidden' }}>
                         <div
                           style={{
                             height: '100%',
                             width: `${((t.rating - 55) / 45) * 100}%`,
-                            background: t.rating >= 80 ? 'var(--accent)' : t.rating >= 70 ? 'var(--green)' : 'var(--orange)',
+                            background: t.rating >= 85 ? 'var(--accent)' : t.rating >= 75 ? 'var(--green)' : 'var(--orange)',
                             borderRadius: 2
                           }}
                         />
@@ -139,8 +142,8 @@ export default function Standings() {
           </tbody>
         </table>
       </div>
-      <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 10, fontFamily: 'DM Mono, monospace' }}>
-        ● = Playoff position (top {conf === 'All' ? 16 : 8})
+      <p style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 10, fontFamily: 'Space Mono, monospace' }}>
+        ● = Playoff position (top {conf === 'All' ? 16 : 8}) | PF = Points For | PA = Points Against | DIFF = Point Differential
       </p>
     </div>
   );
