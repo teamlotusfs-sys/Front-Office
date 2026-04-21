@@ -4,16 +4,11 @@ function random() {
     crypto.getRandomValues(arr);
     return arr[0] / 4294967296;
   }
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    const hex = crypto.randomUUID().replace(/-/g, '').slice(0, 8);
-    return parseInt(hex, 16) / 4294967296;
-  }
-  return Math.random(); // Fallback
+  return Math.random();
 }
 
 export function getBasePPG(ovr, position) {
   const basePPG = ((ovr - 59) / 40) * 24 + 4;
-  
   const positionMultiplier = {
     'PG': 0.9,
     'SG': 1.0,
@@ -21,37 +16,26 @@ export function getBasePPG(ovr, position) {
     'PF': 1.15,
     'C': 1.1,
   };
-  
   return basePPG * (positionMultiplier[position] || 1.0);
 }
 
 export function getGameVariance() {
   const rand = random();
-  
-  if (rand > 0.85) {
-    return 5 + random() * 5;
-  }
-  
-  if (rand < 0.10) {
-    return -5 - random() * 5;
-  }
-  
+  if (rand > 0.85) return 5 + random() * 5;
+  if (rand < 0.10) return -5 - random() * 5;
   return (random() - 0.5) * 6;
 }
 
-export function getMinutesPlayed(isStarter) {
-  if (isStarter) {
-    return 30 + Math.floor(random() * 8);
-  } else {
-    return 8 + Math.floor(random() * 14);
-  }
+export function getMinutesPlayed(isStarter, requestedMinutes) {
+  if (requestedMinutes) return requestedMinutes;
+  if (isStarter) return 30 + Math.floor(random() * 8);
+  return 8 + Math.floor(random() * 14);
 }
 
-export function generatePlayerGameStats(player, isStarter, teamWon) {
-  // Use 'pos' not 'position'
+export function generatePlayerGameStats(player, isStarter, teamWon, requestedMinutes = null) {
   const basePPG = getBasePPG(player.ovr, player.pos);
   const variance = getGameVariance();
-  const minutes = getMinutesPlayed(isStarter);
+  const minutes = getMinutesPlayed(isStarter, requestedMinutes);
   
   const winBonus = teamWon ? 2 + random() * 1.5 : 0;
   
@@ -82,14 +66,5 @@ export function generatePlayerGameStats(player, isStarter, teamWon) {
     (player.ovr / 80)
   ));
   
-  return {
-    points,
-    rebounds,
-    assists,
-    steals,
-    blocks,
-    minutes: Math.round(minutes * 10) / 10,
-    fgm: Math.round(points * 0.45),
-    fga: Math.round(points / 0.45),
-  };
+  return { points, rebounds, assists, steals, blocks, minutes };
 }
