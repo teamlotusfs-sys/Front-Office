@@ -12,6 +12,7 @@ import FreeAgents from './pages/FreeAgents';
 import Schedule from './pages/Schedule';
 import Draft from './pages/Draft';
 import Standings from './pages/Standings';
+import Rotations from './pages/Rotations';
 
 export default function App() {
   return (
@@ -22,6 +23,7 @@ export default function App() {
           <Route element={<GameLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/roster" element={<Roster />} />
+            <Route path="/rotations" element={<Rotations />} />
             <Route path="/trades" element={<Trades />} />
             <Route path="/free-agents" element={<FreeAgents />} />
             <Route path="/schedule" element={<Schedule />} />
