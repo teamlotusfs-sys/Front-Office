@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useGame, formatSalary } from '../hooks/useGameState';
-import { PLAYER_POSITIONS } from '../data/nbaData';
 import './Rotations.css';
 
 export default function Rotations() {
@@ -12,7 +11,6 @@ export default function Rotations() {
 
   const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
   
-  // Initialize minutes allocation
   React.useEffect(() => {
     const newMinutes = {};
     [...startingLineup, ...benchRotation].forEach(player => {
@@ -23,7 +21,7 @@ export default function Rotations() {
     if (Object.keys(newMinutes).length > 0) {
       setMinutesAlloc(prev => ({ ...prev, ...newMinutes }));
     }
-  }, [startingLineup, benchRotation]);
+  }, [startingLineup, benchRotation, minutesAlloc]);
 
   const handleSelectPlayer = (index, isStarter) => {
     if (isStarter) {
@@ -42,10 +40,8 @@ export default function Rotations() {
       const posIndex = positions.indexOf(player.pos);
       const newLineup = [...startingLineup];
       if (newLineup[posIndex] !== null) {
-        // Swap if position already filled
         const displaced = newLineup[posIndex];
         newLineup[posIndex] = player;
-        // Try to add displaced to bench
         const emptyBenchIndex = benchRotation.findIndex(p => p === null);
         if (emptyBenchIndex !== -1) {
           const newBench = [...benchRotation];
@@ -74,6 +70,15 @@ export default function Rotations() {
   const totalSalary = [...startingLineup, ...benchRotation]
     .filter(p => p !== null)
     .reduce((sum, p) => sum + (p?.salary || 0), 0);
+
+  const avgOvr = [...startingLineup, ...benchRotation].filter(p => p !== null).length > 0
+    ? (
+        [...startingLineup, ...benchRotation]
+          .filter(p => p !== null)
+          .reduce((sum, p) => sum + p.ovr, 0) / 
+        [...startingLineup, ...benchRotation].filter(p => p !== null).length
+      ).toFixed(1)
+    : 0;
 
   return (
     <div>
@@ -229,14 +234,7 @@ export default function Rotations() {
         </div>
         <div className="summary-card">
           <div className="summary-label">Avg OVR</div>
-          <div className="summary-value">
-            {(
-              [...startingLineup, ...benchRotation]
-                .filter(p => p !== null)
-                .reduce((sum, p) => sum + p.ovr, 0) / 
-              [...startingLineup, ...benchRotation].filter(p => p !== null).length
-            ).toFixed(1)}
-          </div>
+          <div className="summary-value">{avgOvr}</div>
         </div>
         <div className="summary-card">
           <div className="summary-label">Payroll</div>
