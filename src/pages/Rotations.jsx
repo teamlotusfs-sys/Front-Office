@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGame, formatSalary } from '../hooks/useGameState';
 import './Rotations.css';
 
@@ -9,20 +9,19 @@ export default function Rotations() {
   const [minutesAlloc, setMinutesAlloc] = useState({});
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    if (gameState && gameState.rotations) {
+      setStartingLineup(gameState.rotations.starters || Array(5).fill(null));
+      setBenchRotation(gameState.rotations.bench || Array(8).fill(null));
+      setMinutesAlloc(gameState.rotations.minutesAlloc || {});
+    }
+  }, [gameState]);
+
   if (!gameState) {
     return <div className="page-title">Loading...</div>;
   }
   
-  const { roster, rotations } = gameState;
-
-  React.useEffect(() => {
-    if (rotations && rotations.starters) {
-      setStartingLineup(rotations.starters);
-      setBenchRotation(rotations.bench);
-      setMinutesAlloc(rotations.minutesAlloc);
-    }
-  }, [rotations]);
-
+  const { roster } = gameState;
   const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
 
   const handleSaveRotations = () => {
