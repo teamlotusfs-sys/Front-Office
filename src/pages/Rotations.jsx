@@ -1,13 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useGame, formatSalary } from '../hooks/useGameState';
 import './Rotations.css';
 
 export default function Rotations() {
-  const { gameState } = useGame();
-  const { roster } = gameState;
-  const [startingLineup, setStartingLineup] = useState(Array(5).fill(null));
-  const [benchRotation, setBenchRotation] = useState(Array(8).fill(null));
-  const [minutesAlloc, setMinutesAlloc] = useState({});
+  const { gameState, updateRotations } = useGame();
+  
+  if (!gameState) {
+    return <div className="page-title">Loading...</div>;
+  }
+  
+  const { roster, rotations } = gameState;
+  const [startingLineup, setStartingLineup] = useState(rotations.starters || Array(5).fill(null));
+  const [benchRotation, setBenchRotation] = useState(rotations.bench || Array(8).fill(null));
+  const [minutesAlloc, setMinutesAlloc] = useState(rotations.minutesAlloc || {});
+  const [saved, setSaved] = useState(false);
 
   const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
   
@@ -21,7 +27,13 @@ export default function Rotations() {
     if (Object.keys(newMinutes).length > 0) {
       setMinutesAlloc(prev => ({ ...prev, ...newMinutes }));
     }
-  }, [startingLineup, benchRotation, minutesAlloc]);
+  }, [startingLineup, benchRotation]);
+
+  const handleSaveRotations = () => {
+    updateRotations(startingLineup, benchRotation, minutesAlloc);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
 
   const handleSelectPlayer = (index, isStarter) => {
     if (isStarter) {
@@ -84,6 +96,25 @@ export default function Rotations() {
     <div>
       <h1 className="page-title">Rotations & Lineups</h1>
       <p className="page-subtitle">Build your starting lineup and manage bench rotations</p>
+
+      <button
+        onClick={handleSaveRotations}
+        style={{
+          background: saved ? 'var(--green)' : 'var(--accent)',
+          color: '#0a0a0f',
+          border: 'none',
+          padding: '12px 24px',
+          borderRadius: 6,
+          fontWeight: 700,
+          cursor: 'pointer',
+          marginBottom: 24,
+          transition: 'all 0.3s',
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+        }}
+      >
+        {saved ? '✓ Saved!' : '💾 Save Rotations'}
+      </button>
 
       <div className="rotations-container">
         {/* Left - Roster Selection */}
