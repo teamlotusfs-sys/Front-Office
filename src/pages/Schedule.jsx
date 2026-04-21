@@ -5,13 +5,13 @@ import './Schedule.css';
 
 export default function Schedule() {
   const { gameState, gameAnimation, simulateGame } = useGame();
-  
+  const [filter, setFilter] = useState('all');
+
   if (!gameState) {
     return <div className="page-title">Loading...</div>;
   }
   
   const { schedule } = gameState;
-  const [filter, setFilter] = useState('all');
 
   const filtered = schedule.filter(g => {
     if (filter === 'played') return g.played;
