@@ -115,7 +115,7 @@ export default function Trades() {
             />
           </div>
         ) : (
-          <>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <div className="trade-builder">
               <div className="trade-column trade-column-teams">
                 <div className="trade-column-header">
@@ -294,7 +294,7 @@ export default function Trades() {
                 Propose Trade to {selectedTeam.abbr}
               </button>
             )}
-          </>
+          </div>
         )}
       </div>
 
