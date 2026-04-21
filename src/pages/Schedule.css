@@ -1,0 +1,111 @@
+.schedule-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.week-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.week-header {
+  padding: 14px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.week-header:hover {
+  background: var(--bg-hover);
+}
+
+.week-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.week-progress {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-left: 12px;
+  font-weight: 600;
+}
+
+.week-toggle {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.games-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+}
+
+.game-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.game-card:hover {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+}
+
+.game-info {
+  flex: 1;
+}
+
+.game-date {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.game-opponent {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.game-result {
+  text-align: right;
+  font-family: 'Space Mono', monospace;
+}
+
+.game-score {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.game-score.win {
+  color: var(--green);
+}
+
+.game-score.loss {
+  color: var(--red);
+}
+
+.game-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
