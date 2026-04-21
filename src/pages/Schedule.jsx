@@ -5,8 +5,13 @@ import './Schedule.css';
 
 export default function Schedule() {
   const { gameState, gameAnimation, simulateGame } = useGame();
+  
+  if (!gameState) {
+    return <div className="page-title">Loading...</div>;
+  }
+  
   const { schedule } = gameState;
-  const [filter, setFilter] = useState('all'); // all, played, unplayed
+  const [filter, setFilter] = useState('all');
 
   const filtered = schedule.filter(g => {
     if (filter === 'played') return g.played;
@@ -33,7 +38,6 @@ export default function Schedule() {
       <h1 className="page-title">Schedule</h1>
       <p className="page-subtitle">2025-26 Season</p>
 
-      {/* Stats Bar */}
       <div className="schedule-stats">
         <div className="stat-box">
           <div className="stat-label">Record</div>
@@ -55,24 +59,14 @@ export default function Schedule() {
         </div>
       </div>
 
-      {/* Controls */}
       <div className="schedule-controls">
-        <button
-          onClick={simulateGame}
-          className="sim-btn sim-btn-primary"
-        >
+        <button onClick={simulateGame} className="sim-btn sim-btn-primary">
           ▶ Sim Next Game
         </button>
-        <button
-          onClick={() => handleSimMultiple(5)}
-          className="sim-btn"
-        >
+        <button onClick={() => handleSimMultiple(5)} className="sim-btn">
           ⏩ Sim 5 Games
         </button>
-        <button
-          onClick={() => handleSimMultiple(10)}
-          className="sim-btn"
-        >
+        <button onClick={() => handleSimMultiple(10)} className="sim-btn">
           ⏩⏩ Sim 10 Games
         </button>
         <button
@@ -84,7 +78,6 @@ export default function Schedule() {
         </button>
       </div>
 
-      {/* Filters */}
       <div className="schedule-filters">
         {['all', 'played', 'unplayed'].map(f => (
           <button
@@ -102,26 +95,20 @@ export default function Schedule() {
 
       {gameAnimation && <GameSimAnimation {...gameAnimation} />}
 
-      {/* Schedule List */}
       <div className="schedule-list">
         {filtered.length === 0 ? (
-          <div className="empty-state">
-            <p>No games found</p>
-          </div>
+          <div className="empty-state"><p>No games found</p></div>
         ) : (
           filtered.map((game, idx) => (
             <div
               key={game.id}
-              className={`schedule-game ${game.played ? 'played' : 'upcoming'} ${game.played && game.won ? 'win' : ''} ${game.played && !game.won ? 'loss' : ''}`}
+              className={`schedule-game ${game.played ? 'played' : 'upcoming'} ${
+                game.played && game.won ? 'win' : ''
+              } ${game.played && !game.won ? 'loss' : ''}`}
             >
-              <div className="game-number">
-                Game {idx + 1}
-              </div>
-
+              <div className="game-number">Game {idx + 1}</div>
               <div className="game-matchup">
-                <div className="team-indicator">
-                  {game.isHome ? '🏠' : '✈️'}
-                </div>
+                <div className="team-indicator">{game.isHome ? '🏠' : '✈️'}</div>
                 <div className="opponent-info">
                   <div className="opponent-name">{game.oppName}</div>
                   <div className="opponent-meta">
@@ -130,7 +117,6 @@ export default function Schedule() {
                   </div>
                 </div>
               </div>
-
               <div className="game-status">
                 {game.played ? (
                   <>
