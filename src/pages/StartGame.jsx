@@ -8,10 +8,17 @@ export default function StartGame() {
   const [gmName, setGmName] = useState('');
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [showTeamSelect, setShowTeamSelect] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (gmName.trim() && selectedTeam) {
-      startGame(selectedTeam.id, gmName);
+      setLoading(true);
+      try {
+        await startGame(selectedTeam.id, gmName);
+      } catch (error) {
+        console.error('Failed to start game:', error);
+        setLoading(false);
+      }
     }
   };
 
@@ -99,10 +106,20 @@ export default function StartGame() {
               <div className="team-select-footer">
                 <button
                   onClick={handleStart}
-                  className="start-btn start-btn-success"
+                  disabled={loading}
+                  className={`start-btn start-btn-success ${loading ? 'loading' : ''}`}
                 >
-                  <span>Start with {selectedTeam.name}</span>
-                  <span className="btn-arrow">🚀</span>
+                  {loading ? (
+                    <>
+                      <span>Starting...</span>
+                      <span className="btn-arrow">⏳</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Start with {selectedTeam.name}</span>
+                      <span className="btn-arrow">🚀</span>
+                    </>
+                  )}
                 </button>
               </div>
             )}
