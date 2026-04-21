@@ -1,39 +1,39 @@
 export const NBA_TEAMS = [
-  { id: 'ATL', name: 'Atlanta Wings', city: 'Atlanta', abbr: 'ATL', conf: 'East', div: 'Southeast', color: '#E03A3E', rating: 72, emoji: '🦅' },
-  { id: 'BOS', name: 'Boston Legends', city: 'Boston', abbr: 'BOS', conf: 'East', div: 'Atlantic', color: '#007A33', rating: 86, emoji: '👑' },
-  { id: 'BKN', name: 'Brooklyn Baskets', city: 'Brooklyn', abbr: 'BKN', conf: 'East', div: 'Atlantic', color: '#000000', rating: 68, emoji: '🕸️' },
-  { id: 'CHA', name: 'Charlotte Strikers', city: 'Charlotte', abbr: 'CHA', conf: 'East', div: 'Southeast', color: '#1D1160', rating: 65, emoji: '🐝' },
-  { id: 'CHI', name: 'Chicago Blaze', city: 'Chicago', abbr: 'CHI', conf: 'East', div: 'Central', color: '#CE1141', rating: 74, emoji: '🔥' },
-  { id: 'CLE', name: 'Cleveland Knights', city: 'Cleveland', abbr: 'CLE', conf: 'East', div: 'Central', color: '#860038', rating: 82, emoji: '⚔️' },
-  { id: 'DAL', name: 'Dallas Knights', city: 'Dallas', abbr: 'DAL', conf: 'West', div: 'Southwest', color: '#00538C', rating: 81, emoji: '🤠' },
-  { id: 'DEN', name: 'Denver Gold', city: 'Denver', abbr: 'DEN', conf: 'West', div: 'Northwest', color: '#0E2240', rating: 87, emoji: '⛏️' },
-  { id: 'DET', name: 'Detroit Steel', city: 'Detroit', abbr: 'DET', conf: 'East', div: 'Central', color: '#C8102E', rating: 60, emoji: '🏭' },
-  { id: 'GSW', name: 'Golden State Strikers', city: 'San Francisco', abbr: 'GSW', conf: 'West', div: 'Pacific', color: '#1D428A', rating: 76, emoji: '⚡' },
-  { id: 'HOU', name: 'Houston Rockets', city: 'Houston', abbr: 'HOU', conf: 'West', div: 'Southwest', color: '#CE1141', rating: 71, emoji: '🚀' },
-  { id: 'IND', name: 'Indiana Pacers', city: 'Indianapolis', abbr: 'IND', conf: 'East', div: 'Central', color: '#002D62', rating: 80, emoji: '💨' },
-  { id: 'LAC', name: 'LA Clippers', city: 'Los Angeles', abbr: 'LAC', conf: 'West', div: 'Pacific', color: '#C8102E', rating: 78, emoji: '✂️' },
-  { id: 'LAL', name: 'LA Kings', city: 'Los Angeles', abbr: 'LAL', conf: 'West', div: 'Pacific', color: '#552583', rating: 75, emoji: '👸' },
-  { id: 'MEM', name: 'Memphis Grizzlies', city: 'Memphis', abbr: 'MEM', conf: 'West', div: 'Southwest', color: '#5D76A9', rating: 73, emoji: '🐻' },
-  { id: 'MIA', name: 'Miami Flames', city: 'Miami', abbr: 'MIA', conf: 'East', div: 'Southeast', color: '#98002E', rating: 79, emoji: '🔥' },
-  { id: 'MIL', name: 'Milwaukee Alliance', city: 'Milwaukee', abbr: 'MIL', conf: 'East', div: 'Central', color: '#00471B', rating: 83, emoji: '🦌' },
-  { id: 'MIN', name: 'Minnesota North', city: 'Minneapolis', abbr: 'MIN', conf: 'West', div: 'Northwest', color: '#0C2340', rating: 82, emoji: '❄️' },
-  { id: 'NOP', name: 'New Orleans Pelicans', city: 'New Orleans', abbr: 'NOP', conf: 'West', div: 'Southwest', color: '#0C2340', rating: 76, emoji: '🐦' },
-  { id: 'NYK', name: 'New York Royals', city: 'New York', abbr: 'NYK', conf: 'East', div: 'Atlantic', color: '#006BB6', rating: 80, emoji: '👑' },
-  { id: 'OKC', name: 'Oklahoma City Thunder', city: 'Oklahoma City', abbr: 'OKC', conf: 'West', div: 'Northwest', color: '#007AC1', rating: 85, emoji: '⛈️' },
-  { id: 'ORL', name: 'Orlando Magic', city: 'Orlando', abbr: 'ORL', conf: 'East', div: 'Southeast', color: '#0077C0', rating: 74, emoji: '🪄' },
-  { id: 'PHI', name: 'Philadelphia Elite', city: 'Philadelphia', abbr: 'PHI', conf: 'East', div: 'Atlantic', color: '#006BB6', rating: 70, emoji: '🅰️' },
-  { id: 'PHX', name: 'Phoenix Rising', city: 'Phoenix', abbr: 'PHX', conf: 'West', div: 'Pacific', color: '#1D1160', rating: 69, emoji: '🌅' },
-  { id: 'POR', name: 'Portland Trail', city: 'Portland', abbr: 'POR', conf: 'West', div: 'Northwest', color: '#E03A3E', rating: 63, emoji: '🌲' },
-  { id: 'SAC', name: 'Sacramento Kings', city: 'Sacramento', abbr: 'SAC', conf: 'West', div: 'Pacific', color: '#5A2D81', rating: 74, emoji: '♚' },
-  { id: 'SAS', name: 'San Antonio Spurs', city: 'San Antonio', abbr: 'SAS', conf: 'West', div: 'Southwest', color: '#C4CED4', rating: 62, emoji: '🏇' },
-  { id: 'TOR', name: 'Toronto Raptors', city: 'Toronto', abbr: 'TOR', conf: 'East', div: 'Atlantic', color: '#CE1141', rating: 67, emoji: '🦖' },
-  { id: 'UTA', name: 'Utah Jazz', city: 'Salt Lake City', abbr: 'UTA', conf: 'West', div: 'Northwest', color: '#002B5C', rating: 66, emoji: '🎷' },
-  { id: 'WAS', name: 'Washington Force', city: 'Washington', abbr: 'WAS', conf: 'East', div: 'Southeast', color: '#002B5C', rating: 59, emoji: '💪' },
+  { id: 'ATL', name: 'Atlanta Hawks', city: 'Atlanta', abbr: 'ATL', conf: 'East', div: 'Southeast', color: '#E03A3E', rating: 74, emoji: '🦅' },
+  { id: 'BOS', name: 'Boston Celtics', city: 'Boston', abbr: 'BOS', conf: 'East', div: 'Atlantic', color: '#007A33', rating: 92, emoji: '☘️' },
+  { id: 'BKN', name: 'Brooklyn Nets', city: 'Brooklyn', abbr: 'BKN', conf: 'East', div: 'Atlantic', color: '#000000', rating: 70, emoji: '🕸️' },
+  { id: 'CHA', name: 'Charlotte Hornets', city: 'Charlotte', abbr: 'CHA', conf: 'East', div: 'Southeast', color: '#1D1160', rating: 67, emoji: '🐝' },
+  { id: 'CHI', name: 'Chicago Bulls', city: 'Chicago', abbr: 'CHI', conf: 'East', div: 'Central', color: '#CE1141', rating: 72, emoji: '🔴' },
+  { id: 'CLE', name: 'Cleveland Cavaliers', city: 'Cleveland', abbr: 'CLE', conf: 'East', div: 'Central', color: '#860038', rating: 87, emoji: '👑' },
+  { id: 'DAL', name: 'Dallas Mavericks', city: 'Dallas', abbr: 'DAL', conf: 'West', div: 'Southwest', color: '#00538C', rating: 89, emoji: '⭐' },
+  { id: 'DEN', name: 'Denver Nuggets', city: 'Denver', abbr: 'DEN', conf: 'West', div: 'Northwest', color: '#0E2240', rating: 90, emoji: '⛏️' },
+  { id: 'DET', name: 'Detroit Pistons', city: 'Detroit', abbr: 'DET', conf: 'East', div: 'Central', color: '#C8102E', rating: 68, emoji: '🏀' },
+  { id: 'GSW', name: 'Golden State Warriors', city: 'San Francisco', abbr: 'GSW', conf: 'West', div: 'Pacific', color: '#1D428A', rating: 80, emoji: '⚡' },
+  { id: 'HOU', name: 'Houston Rockets', city: 'Houston', abbr: 'HOU', conf: 'West', div: 'Southwest', color: '#CE1141', rating: 84, emoji: '🚀' },
+  { id: 'IND', name: 'Indiana Pacers', city: 'Indianapolis', abbr: 'IND', conf: 'East', div: 'Central', color: '#002D62', rating: 82, emoji: '💨' },
+  { id: 'LAC', name: 'LA Clippers', city: 'Los Angeles', abbr: 'LAC', conf: 'West', div: 'Pacific', color: '#C8102E', rating: 83, emoji: '✂️' },
+  { id: 'LAL', name: 'LA Lakers', city: 'Los Angeles', abbr: 'LAL', conf: 'West', div: 'Pacific', color: '#552583', rating: 79, emoji: '👑' },
+  { id: 'MEM', name: 'Memphis Grizzlies', city: 'Memphis', abbr: 'MEM', conf: 'West', div: 'Southwest', color: '#5D76A9', rating: 75, emoji: '🐻' },
+  { id: 'MIA', name: 'Miami Heat', city: 'Miami', abbr: 'MIA', conf: 'East', div: 'Southeast', color: '#98002E', rating: 81, emoji: '🔥' },
+  { id: 'MIL', name: 'Milwaukee Bucks', city: 'Milwaukee', abbr: 'MIL', conf: 'East', div: 'Central', color: '#00471B', rating: 89, emoji: '🦌' },
+  { id: 'MIN', name: 'Minnesota Timberwolves', city: 'Minneapolis', abbr: 'MIN', conf: 'West', div: 'Northwest', color: '#0C2340', rating: 86, emoji: '❄️' },
+  { id: 'NOP', name: 'New Orleans Pelicans', city: 'New Orleans', abbr: 'NOP', conf: 'West', div: 'Southwest', color: '#0C2340', rating: 78, emoji: '🐦' },
+  { id: 'NYK', name: 'New York Knicks', city: 'New York', abbr: 'NYK', conf: 'East', div: 'Atlantic', color: '#006BB6', rating: 85, emoji: '🗽' },
+  { id: 'OKC', name: 'Oklahoma City Thunder', city: 'Oklahoma City', abbr: 'OKC', conf: 'West', div: 'Northwest', color: '#007AC1', rating: 94, emoji: '⛈️' },
+  { id: 'ORL', name: 'Orlando Magic', city: 'Orlando', abbr: 'ORL', conf: 'East', div: 'Southeast', color: '#0077C0', rating: 76, emoji: '✨' },
+  { id: 'PHI', name: 'Philadelphia 76ers', city: 'Philadelphia', abbr: 'PHI', conf: 'East', div: 'Atlantic', color: '#006BB6', rating: 88, emoji: '76️⃣' },
+  { id: 'PHX', name: 'Phoenix Suns', city: 'Phoenix', abbr: 'PHX', conf: 'West', div: 'Pacific', color: '#E56020', rating: 87, emoji: '☀️' },
+  { id: 'POR', name: 'Portland Trail Blazers', city: 'Portland', abbr: 'POR', conf: 'West', div: 'Northwest', color: '#E03A3E', rating: 65, emoji: '🌲' },
+  { id: 'SAC', name: 'Sacramento Kings', city: 'Sacramento', abbr: 'SAC', conf: 'West', div: 'Pacific', color: '#5A2D81', rating: 77, emoji: '👑' },
+  { id: 'SAS', name: 'San Antonio Spurs', city: 'San Antonio', abbr: 'SAS', conf: 'West', div: 'Southwest', color: '#C4CED4', rating: 72, emoji: '🎯' },
+  { id: 'TOR', name: 'Toronto Raptors', city: 'Toronto', abbr: 'TOR', conf: 'East', div: 'Atlantic', color: '#CE1141', rating: 71, emoji: '🦖' },
+  { id: 'UTA', name: 'Utah Jazz', city: 'Salt Lake City', abbr: 'UTA', conf: 'West', div: 'Northwest', color: '#002B5C', rating: 68, emoji: '🎺' },
+  { id: 'WAS', name: 'Washington Wizards', city: 'Washington', abbr: 'WAS', conf: 'East', div: 'Southeast', color: '#002B5C', rating: 63, emoji: '🧙' },
 ];
 
 const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
-const firstNames = ['James', 'Anthony', 'Kevin', 'Jayson', 'Luka', 'Shai', 'Tyrese', 'Ja', 'Devin', 'Donovan', 'Trae', 'LaMelo', 'Paolo', 'Chet', 'Victor', 'Franz', 'Evan', 'Jordan', 'Marcus', 'Kyrie', 'Damian', 'CJ', 'Brandon', 'Khris', 'Bam', 'Jimmy', 'Tyler', 'Jaylen', 'Derrick', 'Ben', 'Joel', 'Nikola', 'Jamal', 'Deebo'];
-const lastNames = ['Johnson', 'Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodriguez', 'Lewis', 'Lee', 'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams', 'Nelson', 'Carter'];
+const firstNames = ['Shai', 'Nikola', 'Giannis', 'Jayson', 'Luka', 'Anthony', 'Tyrese', 'Ja', 'Devin', 'Donovan', 'Trae', 'LaMelo', 'Paolo', 'Chet', 'Victor', 'Franz', 'Evan', 'Jordan', 'Marcus', 'Kyrie', 'Damian', 'CJ', 'Brandon', 'Khris', 'Bam', 'Jimmy', 'Tyler', 'Jaylen', 'Derrick', 'Ben', 'Joel', 'Jalen', 'Jamal', 'Anthony', 'Zion', 'Scottie', 'Cam', 'Darius', 'Tyler', 'Tyus', 'Luguentz', 'Keldon', 'Harrison', 'Cole', 'Austin', 'Josh', 'Saddiq'];
+const lastNames = ['Gilgeous-Alexander', 'Jokic', 'Antetokounmpo', 'Tatum', 'Doncic', 'Edwards', 'Haliburton', 'Morant', 'Booker', 'Mitchell', 'Young', 'Ball', 'Banchero', 'Holmgren', 'Wembanyama', 'Wagner', 'Turner', 'Poole', 'Smart', 'Irving', 'Lillard', 'McCollum', 'Ingram', 'Middleton', 'Adebayo', 'Butler', 'Herro', 'Brown', 'Rose', 'Simmons', 'Embiid', 'Green', 'Murray', 'Davis', 'Williamson', 'Barnes', 'Thomas', 'Sabonis', 'Maxey', 'Adams', 'Dort', 'Johnson', 'Barnes', 'Anthony', 'Reeves', 'Green', 'Bey'];
 
 let playerIdCounter = 1;
 
@@ -52,24 +52,43 @@ function random() {
 
 export function generatePlayer(teamId, overrides = {}) {
   const pos = positions[Math.floor(random() * positions.length)];
-  const age = 19 + Math.floor(random() * 16);
+  const age = 21 + Math.floor(random() * 15);
   
+  // Realistic distribution
   let ovr;
   const rand = random();
-  if (rand < 0.7) {
-    ovr = 58 + Math.floor(random() * 17);
-  } else if (rand < 0.95) {
-    ovr = 74 + Math.floor(random() * 8);
+  if (rand < 0.6) {
+    ovr = 65 + Math.floor(random() * 13); // 65-77
+  } else if (rand < 0.9) {
+    ovr = 77 + Math.floor(random() * 8); // 77-85
+  } else if (rand < 0.98) {
+    ovr = 85 + Math.floor(random() * 6); // 85-91
   } else {
-    ovr = 82 + Math.floor(random() * 6);
+    ovr = 91 + Math.floor(random() * 4); // 91-94
   }
   
-  if (!teamId && ovr > 82) {
-    ovr = 82;
+  if (!teamId && ovr > 84) {
+    ovr = 84;
   }
   
-  const pot = Math.min(99, ovr + Math.floor(random() * 15));
-  const salary = Math.round((ovr - 60) * 0.8 + random() * 5 + 1) * 1_000_000;
+  // Realistic salary scale
+  let baseSalary;
+  if (ovr >= 90) {
+    baseSalary = 45 + random() * 10;
+  } else if (ovr >= 85) {
+    baseSalary = 25 + random() * 20;
+  } else if (ovr >= 80) {
+    baseSalary = 12 + random() * 13;
+  } else if (ovr >= 75) {
+    baseSalary = 5 + random() * 7;
+  } else if (ovr >= 70) {
+    baseSalary = 2 + random() * 3;
+  } else {
+    baseSalary = 0.9 + random() * 1.1;
+  }
+  
+  const salary = Math.round(baseSalary * 1_000_000);
+  const pot = Math.min(99, ovr + 3 + Math.floor(random() * 8));
   const yearsLeft = 1 + Math.floor(random() * 4);
 
   return {
@@ -84,62 +103,66 @@ export function generatePlayer(teamId, overrides = {}) {
     yearsLeft,
     teamId,
     stats: {
-      ppg: Math.round((ovr * 0.25 + random() * 8) * 10) / 10,
-      rpg: pos === 'C' || pos === 'PF' ? Math.round((5 + random() * 7) * 10) / 10 : Math.round((2 + random() * 5) * 10) / 10,
-      apg: pos === 'PG' ? Math.round((4 + random() * 7) * 10) / 10 : Math.round((1 + random() * 4) * 10) / 10,
+      ppg: Math.round((15 + (ovr - 70) * 0.5 + random() * 5) * 10) / 10,
+      rpg: pos === 'C' || pos === 'PF' ? Math.round((7 + (ovr - 70) * 0.3 + random() * 4) * 10) / 10 : Math.round((3 + (ovr - 70) * 0.2 + random() * 3) * 10) / 10,
+      apg: pos === 'PG' ? Math.round((6 + (ovr - 70) * 0.2 + random() * 3) * 10) / 10 : Math.round((2 + (ovr - 70) * 0.1 + random() * 2) * 10) / 10,
     },
     ...overrides,
   };
 }
 
-export function generateRoster(teamId, size = 13) {
+export function generateRoster(teamId, size = 15) {
   return Array.from({ length: size }, () => generatePlayer(teamId));
 }
 
 export function generateSchedule(teamId) {
   const opponents = NBA_TEAMS.filter(t => t.id !== teamId);
   const games = [];
-  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
   let gameId = 1;
-  let currentDay = 1;
-  let currentMonthIndex = 0;
   
-  for (let i = 0; i < 40; i++) {
-    const opp = opponents[Math.floor(random() * opponents.length)];
-    
-    currentMonthIndex = Math.floor(i / 6);
-    const month = months[currentMonthIndex];
-    
-    if (i > 0 && i % 6 === 0) {
-      currentDay = 1;
-    }
-    currentDay += Math.floor(random() * 2) + 1;
-    if (currentDay > 28) currentDay = 28;
-    
-    const isHome = random() > 0.5;
-    const played = false;
-    const won = null;
-    const score = null;
-    
-    games.push({ 
-      id: gameId++, 
-      opponent: opp.abbr, 
-      oppName: opp.name, 
-      date: `${month} ${currentDay}`,
-      week: Math.floor(i / 2) + 1,
-      isHome, 
-      played, 
-      won, 
-      score 
-    });
+  // Create 82-game schedule: each team plays each opponent twice (once home, once away)
+  const schedule = [];
+  
+  opponents.forEach(opp => {
+    schedule.push({ opponent: opp, isHome: true });
+    schedule.push({ opponent: opp, isHome: false });
+  });
+  
+  // Shuffle schedule
+  for (let i = schedule.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [schedule[i], schedule[j]] = [schedule[j], schedule[i]];
   }
   
-  return games.sort((a, b) => {
-    const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-    const dateA = months.indexOf(a.date.split(' ')[0]) * 100 + parseInt(a.date.split(' ')[1]);
-    const dateB = months.indexOf(b.date.split(' ')[0]) * 100 + parseInt(b.date.split(' ')[1]);
-    return dateA - dateB;
+  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+  const daysPerMonth = [31, 30, 31, 31, 28, 31, 30];
+  
+  schedule.forEach((s, idx) => {
+    // Distribute games throughout season
+    const gamesPerMonth = Math.ceil(82 / 7);
+    const monthIndex = Math.floor(idx / gamesPerMonth);
+    const dayInMonth = ((idx % gamesPerMonth) + 1) * 2;
+    
+    const actualMonth = Math.min(monthIndex, 6);
+    const actualDay = Math.min(dayInMonth, daysPerMonth[actualMonth]);
+    
+    const week = Math.floor(idx / 2) + 1;
+    
+    games.push({
+      id: gameId++,
+      opponent: s.opponent.abbr,
+      oppName: s.opponent.name,
+      oppColor: s.opponent.color,
+      date: `${months[actualMonth]} ${actualDay}`,
+      week,
+      isHome: s.isHome,
+      played: false,
+      won: null,
+      score: null,
+    });
   });
+  
+  return games;
 }
 
 export function generateDraftPicks(teamId) {
@@ -171,7 +194,7 @@ export function generateDraftPicks(teamId) {
   return picks;
 }
 
-export function generateFreeAgents(count = 40) {
+export function generateFreeAgents(count = 50) {
   return Array.from({ length: count }, () => generatePlayer(null));
 }
 
