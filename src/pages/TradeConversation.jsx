@@ -111,7 +111,7 @@ export default function TradeConversation({
         ))}
       </div>
 
-      {/* Trade Details */}
+      {/* Trade Details - ALWAYS VISIBLE */}
       <div style={{
         borderTop: '1px solid var(--border)',
         padding: '12px 16px',
@@ -120,19 +120,19 @@ export default function TradeConversation({
         maxHeight: 200,
         overflowY: 'auto',
       }}>
-        <div style={{ marginBottom: 8 }}>
-          <div style={{ color: 'var(--text-secondary)', marginBottom: 4 }}>They Give:</div>
+        <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--border)' }}>
+          <div style={{ color: 'var(--accent)', fontWeight: 600, marginBottom: 6 }}>⬆️ They Give:</div>
           {trade.theirPlayers?.map(p => (
-            <div key={p.id} style={{ fontSize: 11, color: 'var(--text-primary)', marginBottom: 2 }}>
-              • {p.firstName} {p.lastName} ({p.ovr} OVR)
+            <div key={p.id} style={{ fontSize: 11, color: 'var(--text-primary)', marginBottom: 3 }}>
+              • {p.firstName} {p.lastName} <span style={{ color: 'var(--accent)' }}>({p.ovr} OVR)</span>
             </div>
           ))}
         </div>
         <div>
-          <div style={{ color: 'var(--text-secondary)', marginBottom: 4 }}>You Give:</div>
+          <div style={{ color: 'var(--green)', fontWeight: 600, marginBottom: 6 }}>⬇️ You Give:</div>
           {trade.yourPlayers?.map(p => (
-            <div key={p.id} style={{ fontSize: 11, color: 'var(--text-primary)', marginBottom: 2 }}>
-              • {p.firstName} {p.lastName} ({p.ovr} OVR)
+            <div key={p.id} style={{ fontSize: 11, color: 'var(--text-primary)', marginBottom: 3 }}>
+              • {p.firstName} {p.lastName} <span style={{ color: 'var(--green)' }}>({p.ovr} OVR)</span>
             </div>
           ))}
         </div>
