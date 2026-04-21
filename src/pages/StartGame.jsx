@@ -5,7 +5,7 @@ import { NBA_TEAMS } from '../data/nbaData';
 import './StartGame.css';
 
 export default function StartGame() {
-  const { gameState, startGame } = useGame();
+  const { startGame } = useGame();
   const navigate = useNavigate();
   const [gmName, setGmName] = useState('');
   const [selectedTeam, setSelectedTeam] = useState(null);
