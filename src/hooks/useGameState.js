@@ -211,7 +211,7 @@ export function GameProvider({ children }) {
         total: unplayedGames.length 
       });
 
-      const yourTeam = prev.team;
+    
       const opponent = NBA_TEAMS.find(t => t.abbr === nextGame.opponent);
       
       // Get active players from rotations
