@@ -1,33 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useGame, formatSalary } from '../hooks/useGameState';
 import './Rotations.css';
 
 export default function Rotations() {
   const { gameState, updateRotations } = useGame();
-  
+  const [startingLineup, setStartingLineup] = useState(Array(5).fill(null));
+  const [benchRotation, setBenchRotation] = useState(Array(8).fill(null));
+  const [minutesAlloc, setMinutesAlloc] = useState({});
+  const [saved, setSaved] = useState(false);
+
   if (!gameState) {
     return <div className="page-title">Loading...</div>;
   }
   
   const { roster, rotations } = gameState;
-  const [startingLineup, setStartingLineup] = useState(rotations.starters || Array(5).fill(null));
-  const [benchRotation, setBenchRotation] = useState(rotations.bench || Array(8).fill(null));
-  const [minutesAlloc, setMinutesAlloc] = useState(rotations.minutesAlloc || {});
-  const [saved, setSaved] = useState(false);
+
+  React.useEffect(() => {
+    if (rotations && rotations.starters) {
+      setStartingLineup(rotations.starters);
+      setBenchRotation(rotations.bench);
+      setMinutesAlloc(rotations.minutesAlloc);
+    }
+  }, [rotations]);
 
   const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
-  
-  React.useEffect(() => {
-    const newMinutes = {};
-    [...startingLineup, ...benchRotation].forEach(player => {
-      if (player && !minutesAlloc[player.id]) {
-        newMinutes[player.id] = player === startingLineup.find(p => p?.id === player.id) ? 32 : 12;
-      }
-    });
-    if (Object.keys(newMinutes).length > 0) {
-      setMinutesAlloc(prev => ({ ...prev, ...newMinutes }));
-    }
-  }, [startingLineup, benchRotation]);
 
   const handleSaveRotations = () => {
     updateRotations(startingLineup, benchRotation, minutesAlloc);
@@ -117,7 +113,6 @@ export default function Rotations() {
       </button>
 
       <div className="rotations-container">
-        {/* Left - Roster Selection */}
         <div className="rotation-section rotation-roster">
           <div className="rotation-section-header">
             <h3>🏀 Available Players ({availablePlayers.length})</h3>
@@ -154,7 +149,6 @@ export default function Rotations() {
           </div>
         </div>
 
-        {/* Middle - Starting Lineup */}
         <div className="rotation-section">
           <div className="rotation-section-header">
             <h3>⭐ Starting Lineup</h3>
@@ -204,7 +198,6 @@ export default function Rotations() {
           </div>
         </div>
 
-        {/* Right - Bench Rotation */}
         <div className="rotation-section">
           <div className="rotation-section-header">
             <h3>🪑 Bench Rotation</h3>
@@ -251,7 +244,6 @@ export default function Rotations() {
         </div>
       </div>
 
-      {/* Stats Summary */}
       <div className="rotation-summary">
         <div className="summary-card">
           <div className="summary-label">Total Players</div>
