@@ -6,6 +6,7 @@ import './GameLayout.css';
 const NAV = [
   { to: '/dashboard', icon: '📊', label: 'Dashboard' },
   { to: '/roster', icon: '👥', label: 'Roster' },
+  { to: '/rotations', icon: '⭐', label: 'Rotations' },
   { to: '/trades', icon: '🔄', label: 'Trades' },
   { to: '/free-agents', icon: '✍️', label: 'Free Agents' },
   { to: '/schedule', icon: '📅', label: 'Schedule' },
