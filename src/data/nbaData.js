@@ -30,9 +30,10 @@ export const NBA_TEAMS = [
   { id: 'UTA', name: 'Utah Nova', city: 'Salt Lake City', abbr: 'UTA', conf: 'West', div: 'Northwest', color: '#002B5C', rating: 66, emoji: '🎷' },
   { id: 'WAS', name: 'Washington Force', city: 'Washington', abbr: 'WAS', conf: 'East', div: 'Southeast', color: '#002B5C', rating: 59, emoji: '💪' },
 ];
+
 const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
-const firstNames = ['James', 'Anthony', 'Kevin', 'Jayson', 'Luka', 'Shai', 'Tyrese', 'Ja', 'Devin', 'Donovan', 'Trae', 'LaMelo', 'Paolo', 'Chet', 'Victor', 'Franz', 'Evan', 'Jordan', 'Marcus', 'Kyle', 'Kyrie', 'Damian', 'Brandon', 'De\'Aaron', 'Tyson', 'Chris', 'Kawhi', 'Jimmy', 'Paul', 'LeBron', 'Giannis', 'Nikola', 'Lol', 'Rui', 'OG', 'Robert', 'Scottie', 'Paolo', 'Paolo', 'Desmond', 'Keldon', 'Cole', 'Jalen', 'Austin', 'Alperen', 'Tari', 'Precious', 'Ayo', 'Darius', 'Herbert', 'Jalen', 'Jalen', 'Tre', 'Keegan', 'Bennedict', 'Jaime', 'Stanley', 'Oscar', 'Tre', 'Killian', 'Max', 'Leaky', 'Lamar', 'Isaiah', 'Aaron', 'Jalen', 'Charles', 'Bones', 'Osan', 'Saddiq', 'Isaiah', 'Isaiah', 'Bobby', 'Harrison', 'Malik', 'Juan', 'Trey', 'Kostas', 'Daniel', 'Isaiah', 'Isaiah', 'Lonnie', 'Chris', 'Moses', 'Javon', 'Jae', 'Derrick', 'Oshae', 'Joe', 'AJ'];
-const lastNames = ['Johnson', 'Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodriguez', 'Lewis', 'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams', 'Nelson', 'Carter', 'Roberts', 'Phillips', 'Campbell', 'Parker', 'Evans', 'Edwards', 'Collins', 'Reeves', 'Stewart', 'Sengun', 'Eze', 'Achiuwa', 'Dosunmu', 'Sabonis', 'Jones Jr', 'Adebayo', 'Jones', 'Brunson', 'Holiday', 'Smart', 'Allen', 'Claxton', 'Tatum', 'Brown', 'Doncic', 'Irving', 'Hardaway', 'Jokic', 'Murray', 'Nurkic', 'Holiday', 'Leonard', 'George'];
+const firstNames = ['James', 'Anthony', 'Kevin', 'Jayson', 'Luka', 'Shai', 'Tyrese', 'Ja', 'Devin', 'Donovan', 'Trae', 'LaMelo', 'Paolo', 'Chet', 'Victor', 'Franz', 'Evan', 'Jordan', 'Marcus', 'Kyrie', 'Damian', 'CJ', 'Brandon', 'Khris', 'Bam', 'Jimmy', 'Tyler', 'Jaylen', 'Derrick', 'Ben', 'Joel', 'Nikola', 'Jamal', 'Deebo'];
+const lastNames = ['Johnson', 'Williams', 'Brown', 'Davis', 'Miller', 'Wilson', 'Moore', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodriguez', 'Lewis', 'Lee', 'Walker', 'Hall', 'Allen', 'Young', 'Hernandez', 'King', 'Wright', 'Lopez', 'Hill', 'Scott', 'Green', 'Adams', 'Nelson', 'Carter'];
 
 let playerIdCounter = 1;
 
@@ -53,22 +54,16 @@ export function generatePlayer(teamId, overrides = {}) {
   const pos = positions[Math.floor(random() * positions.length)];
   const age = 19 + Math.floor(random() * 16);
   
-  // More realistic overall generation
-  // Most players 60-75, some 75-82, rare 82+
   let ovr;
   const rand = random();
   if (rand < 0.7) {
-    // 70% of players: 58-74
     ovr = 58 + Math.floor(random() * 17);
   } else if (rand < 0.95) {
-    // 25% of players: 74-82
     ovr = 74 + Math.floor(random() * 8);
   } else {
-    // 5% of players: 82-88 (super rare elite players)
     ovr = 82 + Math.floor(random() * 6);
   }
   
-  // Cap free agents at 82 overall max
   if (!teamId && ovr > 82) {
     ovr = 82;
   }
@@ -112,15 +107,13 @@ export function generateSchedule(teamId) {
   for (let i = 0; i < 40; i++) {
     const opp = opponents[Math.floor(random() * opponents.length)];
     
-    // Update month every 6 games
     currentMonthIndex = Math.floor(i / 6);
     const month = months[currentMonthIndex];
     
-    // Increment day, reset when month changes
     if (i > 0 && i % 6 === 0) {
       currentDay = 1;
     }
-    currentDay += Math.floor(random() * 2) + 1; // 1-2 days between games
+    currentDay += Math.floor(random() * 2) + 1;
     if (currentDay > 28) currentDay = 28;
     
     const isHome = random() > 0.5;
@@ -141,7 +134,6 @@ export function generateSchedule(teamId) {
     });
   }
   
-  // Sort by date to ensure chronological order
   return games.sort((a, b) => {
     const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
     const dateA = months.indexOf(a.date.split(' ')[0]) * 100 + parseInt(a.date.split(' ')[1]);
@@ -150,14 +142,37 @@ export function generateSchedule(teamId) {
   });
 }
 
+// Generate realistic draft picks for each team
 export function generateDraftPicks(teamId) {
-  return [
-    { year: 2025, round: 1, from: teamId, protected: null },
-    { year: 2025, round: 2, from: 'GSW', protected: null },
-    { year: 2026, round: 1, from: teamId, protected: 'Top-5' },
-    { year: 2026, round: 2, from: teamId, protected: null },
-    { year: 2027, round: 1, from: teamId, protected: null },
-  ];
+  const picks = [];
+  
+  // Every team has picks for this year and next 2 years
+  // Round 1 and 2 each year
+  for (let year = 2025; year <= 2027; year++) {
+    for (let round = 1; round <= 2; round++) {
+      let from = teamId;
+      let protected = null;
+      
+      // Randomly some picks are from other teams (trades)
+      if (random() < 0.3) {
+        from = NBA_TEAMS[Math.floor(random() * NBA_TEAMS.length)].id;
+        if (random() < 0.5) {
+          const protectionTypes = ['Top-3', 'Top-5', 'Top-10'];
+          protected = protectionTypes[Math.floor(random() * protectionTypes.length)];
+        }
+      }
+      
+      picks.push({
+        year,
+        round,
+        from,
+        protected,
+        id: `${year}-R${round}-${from}`,
+      });
+    }
+  }
+  
+  return picks;
 }
 
 export function generateFreeAgents(count = 40) {
@@ -165,3 +180,8 @@ export function generateFreeAgents(count = 40) {
 }
 
 export const PLAYER_POSITIONS = positions;
+
+export function formatSalary(n) {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(1)}M`;
+  return `$${(n / 1_000).toFixed(0)}K`;
+}
