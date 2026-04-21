@@ -4,10 +4,9 @@ import GameSimAnimation from '../components/GameSimAnimation';
 import './Schedule.css';
 
 export default function Schedule() {
-  const { gameState, simulateGame } = useGame();
-  const { schedule, week } = gameState;
-  const [expandedWeek, setExpandedWeek] = useState(week);
-  const [gameAnimation, setGameAnimation] = React.useState(null);
+ const { gameState, gameAnimation, simulateGame } = useGame();
+const { schedule, week } = gameState;
+const [expandedWeek, setExpandedWeek] = useState(week);
 
   // Group by week
   const gamesByWeek = {};
