@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap');
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -26,15 +28,20 @@ html, body, #root { height: 100%; }
 body {
   background: var(--bg-base);
   color: var(--text-primary);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Outfit', sans-serif;
   font-size: 14px;
+  font-weight: 500;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
 
-h1, h2, h3, h4 { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
+h1, h2, h3, h4, h5, h6 { 
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
 
-button { cursor: pointer; font-family: inherit; border: none; }
+button { cursor: pointer; font-family: inherit; border: none; font-weight: 600; }
 a { text-decoration: none; color: inherit; }
 input, select { font-family: inherit; }
 
@@ -43,13 +50,13 @@ input, select { font-family: inherit; }
 ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
 
 /* Utility */
-.mono { font-family: 'DM Mono', monospace; }
+.mono { font-family: 'Space Mono', monospace; }
 .accent { color: var(--accent); }
 .muted { color: var(--text-secondary); }
 .badge {
   display: inline-flex; align-items: center; justify-content: center;
   padding: 2px 8px; border-radius: 4px; font-size: 11px;
-  font-weight: 600; font-family: 'DM Mono', monospace; letter-spacing: 0.04em;
+  font-weight: 600; font-family: 'Space Mono', monospace; letter-spacing: 0.04em;
 }
 .badge-green { background: rgba(46,213,115,0.15); color: var(--green); }
 .badge-red { background: rgba(255,71,87,0.15); color: var(--red); }
