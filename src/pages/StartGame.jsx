@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
 import './StartGame.css';
 
 export default function StartGame() {
-  const { startGame } = useGame();
+  const { gameState, startGame } = useGame();
+  const navigate = useNavigate();
   const [gmName, setGmName] = useState('');
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [showTeamSelect, setShowTeamSelect] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleStart = async () => {
+  const handleStart = () => {
     if (gmName.trim() && selectedTeam) {
       setLoading(true);
       try {
-        await startGame(selectedTeam.id, gmName);
+        startGame(selectedTeam.id, gmName);
+        // Navigate after a short delay to ensure state is set
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 100);
       } catch (error) {
         console.error('Failed to start game:', error);
         setLoading(false);
