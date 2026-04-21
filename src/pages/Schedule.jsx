@@ -4,157 +4,156 @@ import GameSimAnimation from '../components/GameSimAnimation';
 import './Schedule.css';
 
 export default function Schedule() {
- const { gameState, gameAnimation, simulateGame } = useGame();
-const { schedule, week } = gameState;
-const [expandedWeek, setExpandedWeek] = useState(week);
+  const { gameState, gameAnimation, simulateGame } = useGame();
+  const { schedule } = gameState;
+  const [filter, setFilter] = useState('all'); // all, played, unplayed
 
-  // Group by week
-  const gamesByWeek = {};
-  schedule.forEach(g => {
-    const w = g.week || 1;
-    if (!gamesByWeek[w]) gamesByWeek[w] = [];
-    gamesByWeek[w].push(g);
+  const filtered = schedule.filter(g => {
+    if (filter === 'played') return g.played;
+    if (filter === 'unplayed') return !g.played;
+    return true;
   });
 
-  const weeks = Object.keys(gamesByWeek).sort((a, b) => parseInt(a) - parseInt(b));
-  const unplayedCount = schedule.filter(g => !g.played).length;
+  const stats = {
+    total: schedule.length,
+    played: schedule.filter(g => g.played).length,
+    wins: schedule.filter(g => g.played && g.won).length,
+    losses: schedule.filter(g => g.played && !g.won).length,
+    remaining: schedule.filter(g => !g.played).length,
+  };
+
+  const handleSimMultiple = (count) => {
+    for (let i = 0; i < count; i++) {
+      setTimeout(() => simulateGame(), i * 1200);
+    }
+  };
 
   return (
     <div>
       <h1 className="page-title">Schedule</h1>
-      <p className="page-subtitle">Remaining: {unplayedCount} games</p>
+      <p className="page-subtitle">2025-26 Season</p>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
-        <button 
+      {/* Stats Bar */}
+      <div className="schedule-stats">
+        <div className="stat-box">
+          <div className="stat-label">Record</div>
+          <div className="stat-value">{stats.wins}-{stats.losses}</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-label">Played</div>
+          <div className="stat-value">{stats.played}/{stats.total}</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-label">Remaining</div>
+          <div className="stat-value">{stats.remaining}</div>
+        </div>
+        <div className="stat-box">
+          <div className="stat-label">Win %</div>
+          <div className="stat-value">
+            {stats.played > 0 ? ((stats.wins / stats.played) * 100).toFixed(1) : '0.0'}%
+          </div>
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="schedule-controls">
+        <button
           onClick={simulateGame}
-          style={{
-            background: 'var(--accent)',
-            color: '#0a0a0f',
-            border: 'none',
-            padding: '12px 24px',
-            borderRadius: 6,
-            fontWeight: 700,
-            cursor: 'pointer',
-            fontSize: 14,
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            transition: 'all 0.3s',
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'translateY(-2px)';
-            e.target.style.boxShadow = '0 8px 20px rgba(232, 255, 71, 0.3)';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'translateY(0)';
-            e.target.style.boxShadow = 'none';
-          }}
+          className="sim-btn sim-btn-primary"
         >
           ▶ Sim Next Game
         </button>
-        <button 
-          onClick={() => {
-            for (let i = 0; i < 10; i++) {
-              setTimeout(() => simulateGame(), i * 1000);
-            }
-          }}
-          style={{
-            background: 'var(--bg-card)',
-            color: 'var(--text-primary)',
-            border: '1px solid var(--border)',
-            padding: '12px 24px',
-            borderRadius: 6,
-            fontWeight: 700,
-            cursor: 'pointer',
-            fontSize: 14,
-            textTransform: 'uppercase',
-            letterSpacing: '1px',
-            transition: 'all 0.3s',
-          }}
+        <button
+          onClick={() => handleSimMultiple(5)}
+          className="sim-btn"
         >
-          ⏩ Sim 10 Games
+          ⏩ Sim 5 Games
         </button>
+        <button
+          onClick={() => handleSimMultiple(10)}
+          className="sim-btn"
+        >
+          ⏩⏩ Sim 10 Games
+        </button>
+        <button
+          onClick={() => handleSimMultiple(stats.remaining)}
+          className="sim-btn"
+          disabled={stats.remaining === 0}
+        >
+          ⏭️ Sim Rest of Season
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="schedule-filters">
+        {['all', 'played', 'unplayed'].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={`filter-btn ${filter === f ? 'active' : ''}`}
+          >
+            {f === 'all' ? 'All Games' : f === 'played' ? 'Played' : 'Upcoming'}
+            <span className="filter-count">
+              {f === 'all' ? stats.total : f === 'played' ? stats.played : stats.remaining}
+            </span>
+          </button>
+        ))}
       </div>
 
       {gameAnimation && <GameSimAnimation {...gameAnimation} />}
 
-      <div>
-        {weeks.map(w => {
-          const played = gamesByWeek[w].filter(g => g.played).length;
-          const total = gamesByWeek[w].length;
-          
-          return (
-            <div key={w} style={{ marginBottom: 16 }}>
-              <button
-                onClick={() => setExpandedWeek(expandedWeek === parseInt(w) ? null : parseInt(w))}
-                style={{
-                  background: 'var(--bg-card)',
-                  border: '1px solid var(--border)',
-                  padding: '14px',
-                  borderRadius: 6,
-                  width: '100%',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  fontWeight: 600,
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  transition: 'all 0.2s',
-                }}
-                onMouseEnter={(e) => e.target.style.background = 'var(--bg-hover)'}
-                onMouseLeave={(e) => e.target.style.background = 'var(--bg-card)'}
-              >
-                <div>
-                  <span>Week {w}</span>
-                  <span style={{ marginLeft: 12, fontSize: 12, color: 'var(--text-secondary)', fontWeight: 400 }}>
-                    ({played}/{total})
-                  </span>
+      {/* Schedule List */}
+      <div className="schedule-list">
+        {filtered.length === 0 ? (
+          <div className="empty-state">
+            <p>No games found</p>
+          </div>
+        ) : (
+          filtered.map((game, idx) => (
+            <div
+              key={game.id}
+              className={`schedule-game ${game.played ? 'played' : 'upcoming'} ${game.played && game.won ? 'win' : ''} ${game.played && !game.won ? 'loss' : ''}`}
+            >
+              <div className="game-number">
+                Game {idx + 1}
+              </div>
+
+              <div className="game-matchup">
+                <div className="team-indicator">
+                  {game.isHome ? '🏠' : '✈️'}
                 </div>
-                <span>{expandedWeek === parseInt(w) ? '▼' : '▶'}</span>
-              </button>
+                <div className="opponent-info">
+                  <div className="opponent-name">{game.oppName}</div>
+                  <div className="opponent-meta">
+                    <span className="opponent-abbr">{game.opponent}</span>
+                    <span className="game-date">{game.date}</span>
+                  </div>
+                </div>
+              </div>
 
-              {expandedWeek === parseInt(w) && (
-                <div style={{ paddingTop: 12 }}>
-                  {gamesByWeek[w].map(game => (
-                    <div
-                      key={game.id}
-                      style={{
-                        background: 'var(--bg-surface)',
-                        border: '1px solid var(--border)',
-                        borderRadius: 6,
-                        padding: '12px',
-                        marginBottom: 8,
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                      }}
-                    >
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 4 }}>
-                          {game.date} {game.isHome ? '🏠 Home' : '✈️ Away'}
-                        </div>
-                        <div style={{ fontWeight: 600 }}>vs {game.opponent}</div>
-                      </div>
-
-                      {game.played ? (
-                        <div style={{ textAlign: 'right', fontFamily: 'Space Mono, monospace' }}>
-                          <div style={{ 
-                            fontSize: 16, 
-                            fontWeight: 700,
-                            color: game.won ? 'var(--green)' : 'var(--red)',
-                          }}>
-                            {game.won ? 'W' : 'L'} {game.score.us}-{game.score.them}
-                          </div>
-                        </div>
-                      ) : (
-                        <div style={{ color: 'var(--text-secondary)', fontSize: 12 }}>Not played</div>
-                      )}
+              <div className="game-status">
+                {game.played ? (
+                  <>
+                    <div className={`result-badge ${game.won ? 'win' : 'loss'}`}>
+                      {game.won ? 'W' : 'L'}
                     </div>
-                  ))}
-                </div>
-              )}
+                    <div className="score">
+                      <span className={game.won ? 'winning-score' : 'losing-score'}>
+                        {game.score.us}
+                      </span>
+                      <span className="score-dash">-</span>
+                      <span className={!game.won ? 'winning-score' : 'losing-score'}>
+                        {game.score.them}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="upcoming-badge">Upcoming</div>
+                )}
+              </div>
             </div>
-          );
-        })}
+          ))
+        )}
       </div>
     </div>
   );
