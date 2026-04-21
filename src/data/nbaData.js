@@ -54,24 +54,22 @@ export function generatePlayer(teamId, overrides = {}) {
   const pos = positions[Math.floor(random() * positions.length)];
   const age = 21 + Math.floor(random() * 15);
   
-  // Realistic distribution
   let ovr;
   const rand = random();
   if (rand < 0.6) {
-    ovr = 65 + Math.floor(random() * 13); // 65-77
+    ovr = 65 + Math.floor(random() * 13);
   } else if (rand < 0.9) {
-    ovr = 77 + Math.floor(random() * 8); // 77-85
+    ovr = 77 + Math.floor(random() * 8);
   } else if (rand < 0.98) {
-    ovr = 85 + Math.floor(random() * 6); // 85-91
+    ovr = 85 + Math.floor(random() * 6);
   } else {
-    ovr = 91 + Math.floor(random() * 4); // 91-94
+    ovr = 91 + Math.floor(random() * 4);
   }
   
   if (!teamId && ovr > 84) {
     ovr = 84;
   }
   
-  // Realistic salary scale
   let baseSalary;
   if (ovr >= 90) {
     baseSalary = 45 + random() * 10;
@@ -117,18 +115,24 @@ export function generateRoster(teamId, size = 15) {
 
 export function generateSchedule(teamId) {
   const opponents = NBA_TEAMS.filter(t => t.id !== teamId);
-  const games = [];
   let gameId = 1;
-  
-  // Create 82-game schedule: each team plays each opponent twice (once home, once away)
+  const games = [];
   const schedule = [];
   
+  // Create exactly 82 games
   opponents.forEach(opp => {
     schedule.push({ opponent: opp, isHome: true });
     schedule.push({ opponent: opp, isHome: false });
   });
   
-  // Shuffle schedule
+  // We have 58 games (29 * 2), need 82. Add 24 more (some teams 3x)
+  const extraGames = 82 - schedule.length;
+  for (let i = 0; i < extraGames; i++) {
+    const opp = opponents[Math.floor(random() * opponents.length)];
+    schedule.push({ opponent: opp, isHome: random() > 0.5 });
+  }
+  
+  // Shuffle
   for (let i = schedule.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
     [schedule[i], schedule[j]] = [schedule[j], schedule[i]];
@@ -138,7 +142,6 @@ export function generateSchedule(teamId) {
   const daysPerMonth = [31, 30, 31, 31, 28, 31, 30];
   
   schedule.forEach((s, idx) => {
-    // Distribute games throughout season
     const gamesPerMonth = Math.ceil(82 / 7);
     const monthIndex = Math.floor(idx / gamesPerMonth);
     const dayInMonth = ((idx % gamesPerMonth) + 1) * 2;
@@ -146,15 +149,13 @@ export function generateSchedule(teamId) {
     const actualMonth = Math.min(monthIndex, 6);
     const actualDay = Math.min(dayInMonth, daysPerMonth[actualMonth]);
     
-    const week = Math.floor(idx / 2) + 1;
-    
     games.push({
       id: gameId++,
       opponent: s.opponent.abbr,
       oppName: s.opponent.name,
       oppColor: s.opponent.color,
       date: `${months[actualMonth]} ${actualDay}`,
-      week,
+      week: Math.floor(idx / 2) + 1,
       isHome: s.isHome,
       played: false,
       won: null,
