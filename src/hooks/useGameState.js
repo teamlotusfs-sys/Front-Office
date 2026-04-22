@@ -176,142 +176,190 @@ export function GameProvider({ children }) {
     });
   }, []);
 
-  const simulateGame = useCallback(() => {
-    setGameState(prev => {
-      if (!prev) return prev;
-      
-      const unplayedGames = prev.schedule.filter(g => !g.played);
-      if (!unplayedGames.length) {
-        const newNotif = { id: Date.now(), type: 'info', text: 'Season complete!', read: false };
-        return { ...prev, notifications: [newNotif, ...prev.notifications] };
-      }
-      
-      const nextGame = unplayedGames.sort((a, b) => parseDate(a.date) - parseDate(b.date))[0];
-      
-      setGameAnimation({ game: nextGame, progress: 1, total: unplayedGames.length });
+const simulateGame = useCallback(() => {
+  setGameState(prev => {
+    if (!prev) return prev;
+    
+    const unplayedGames = prev.schedule.filter(g => !g.played);
+    if (!unplayedGames.length) {
+      const newNotif = { id: Date.now(), type: 'info', text: 'Season complete!', read: false };
+      return { ...prev, notifications: [newNotif, ...prev.notifications] };
+    }
+    
+    const nextGame = unplayedGames.sort((a, b) => parseDate(a.date) - parseDate(b.date))[0];
+    
+    setGameAnimation({ game: nextGame, progress: 1, total: unplayedGames.length });
 
-      const opponent = NBA_TEAMS.find(t => t.abbr === nextGame.opponent);
-      if (!opponent) {
-        console.error('Opponent not found:', nextGame.opponent);
-        setGameAnimation(null);
-        return prev;
-      }
-      
-      const rotations = prev.rotations;
-      const activePlayers = [...rotations.starters, ...rotations.bench].filter(p => p !== null);
-      
-      if (activePlayers.length < 5) {
-        const newNotif = { id: Date.now(), type: 'warning', text: 'Need 5+ players in rotation!', read: false };
-        setGameAnimation(null);
-        return { ...prev, notifications: [newNotif, ...prev.notifications] };
-      }
+    const opponent = NBA_TEAMS.find(t => t.abbr === nextGame.opponent);
+    if (!opponent) {
+      console.error('Opponent not found:', nextGame.opponent);
+      setGameAnimation(null);
+      return prev;
+    }
+    
+    const rotations = prev.rotations;
+    const activePlayers = [...rotations.starters, ...rotations.bench].filter(p => p !== null);
+    
+    if (activePlayers.length < 5) {
+      const newNotif = { id: Date.now(), type: 'warning', text: 'Need 5+ players in rotation!', read: false };
+      setGameAnimation(null);
+      return { ...prev, notifications: [newNotif, ...prev.notifications] };
+    }
 
-      // Simulate game
-      const avgActiveOvr = activePlayers.reduce((sum, p) => sum + p.ovr, 0) / activePlayers.length;
-      const homeBonus = nextGame.isHome ? 2 : -2;
-      const adjustedRating = avgActiveOvr + homeBonus;
-      const adjustedOppRating = opponent.rating - homeBonus;
+    // Simulate YOUR game
+    const avgActiveOvr = activePlayers.reduce((sum, p) => sum + p.ovr, 0) / activePlayers.length;
+    const homeBonus = nextGame.isHome ? 2 : -2;
+    const adjustedRating = avgActiveOvr + homeBonus;
+    const adjustedOppRating = opponent.rating - homeBonus;
+    
+    const totalRating = adjustedRating + adjustedOppRating;
+    const winProbability = adjustedRating / totalRating;
+    const won = random() < winProbability;
+    
+    const baseScore = 100 + ((avgActiveOvr - 70) * 0.8);
+    const yourScore = Math.round(baseScore + (random() - 0.5) * 20);
+    const oppBaseScore = 100 + ((opponent.rating - 70) * 0.8);
+    const oppScore = Math.round(oppBaseScore + (random() - 0.5) * 20);
+    
+    const finalYourScore = won ? Math.max(oppScore + 1, yourScore) : Math.min(oppScore - 1, yourScore);
+    const finalOppScore = won ? oppScore : Math.max(finalYourScore + 1, oppScore);
+    const score = { us: finalYourScore, them: finalOppScore };
+    
+    // Generate stats
+    const newPlayerStats = { ...prev.playerStats };
+    
+    activePlayers.forEach(player => {
+      const isStarter = rotations.starters.includes(player);
+      const minutes = rotations.minutesAlloc[player.id] || (isStarter ? 32 : 12);
+      const gameStats = generatePlayerGameStats(player, isStarter, won, minutes);
       
-      const totalRating = adjustedRating + adjustedOppRating;
-      const winProbability = adjustedRating / totalRating;
-      const won = random() < winProbability;
+      if (!newPlayerStats[player.id]) {
+        newPlayerStats[player.id] = {
+          gamesPlayed: 0,
+          totalPoints: 0,
+          totalRebounds: 0,
+          totalAssists: 0,
+          totalSteals: 0,
+          totalBlocks: 0,
+          gameLog: [],
+        };
+      }
       
-      const baseScore = 100 + ((avgActiveOvr - 70) * 0.8);
-      const yourScore = Math.round(baseScore + (random() - 0.5) * 20);
-      const oppBaseScore = 100 + ((opponent.rating - 70) * 0.8);
-      const oppScore = Math.round(oppBaseScore + (random() - 0.5) * 20);
-      
-      const finalYourScore = won ? Math.max(oppScore + 1, yourScore) : Math.min(oppScore - 1, yourScore);
-      const finalOppScore = won ? oppScore : Math.max(finalYourScore + 1, oppScore);
-      const score = { us: finalYourScore, them: finalOppScore };
-      
-      // Generate stats
-      const newPlayerStats = { ...prev.playerStats };
-      
-      activePlayers.forEach(player => {
-        const isStarter = rotations.starters.includes(player);
-        const minutes = rotations.minutesAlloc[player.id] || (isStarter ? 32 : 12);
-        const gameStats = generatePlayerGameStats(player, isStarter, won, minutes);
-        
-        if (!newPlayerStats[player.id]) {
-          newPlayerStats[player.id] = {
-            gamesPlayed: 0,
-            totalPoints: 0,
-            totalRebounds: 0,
-            totalAssists: 0,
-            totalSteals: 0,
-            totalBlocks: 0,
-            gameLog: [],
-          };
-        }
-        
-        newPlayerStats[player.id].gamesPlayed++;
-        newPlayerStats[player.id].totalPoints += gameStats.points;
-        newPlayerStats[player.id].totalRebounds += gameStats.rebounds;
-        newPlayerStats[player.id].totalAssists += gameStats.assists;
-        newPlayerStats[player.id].totalSteals += gameStats.steals;
-        newPlayerStats[player.id].totalBlocks += gameStats.blocks;
-        newPlayerStats[player.id].gameLog.push(gameStats);
-      });
-      
-      const oppRoster = prev.allRosters[opponent.id] || [];
-      oppRoster.forEach(player => {
-        const isStarter = oppRoster.indexOf(player) < 5;
-        const gameStats = generatePlayerGameStats(player, isStarter, !won);
-        
-        if (!newPlayerStats[player.id]) {
-          newPlayerStats[player.id] = {
-            gamesPlayed: 0,
-            totalPoints: 0,
-            totalRebounds: 0,
-            totalAssists: 0,
-            totalSteals: 0,
-            totalBlocks: 0,
-            gameLog: [],
-          };
-        }
-        
-        newPlayerStats[player.id].gamesPlayed++;
-        newPlayerStats[player.id].totalPoints += gameStats.points;
-        newPlayerStats[player.id].totalRebounds += gameStats.rebounds;
-        newPlayerStats[player.id].totalAssists += gameStats.assists;
-        newPlayerStats[player.id].totalSteals += gameStats.steals;
-        newPlayerStats[player.id].totalBlocks += gameStats.blocks;
-        newPlayerStats[player.id].gameLog.push(gameStats);
-      });
-      
-      const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
-      const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
-      
-      // Update schedules
-      const newAllSchedules = { ...prev.allSchedules };
-      const newTeamRecords = { ...prev.teamRecords };
-      
-      newAllSchedules[prev.team.id] = prev.schedule.map(g => g.id === nextGame.id ? { ...g, played: true, won, score } : g);
-      newTeamRecords[prev.team.id].w += won ? 1 : 0;
-      newTeamRecords[prev.team.id].l += !won ? 1 : 0;
-      newTeamRecords[prev.team.id].pf += score.us;
-      newTeamRecords[prev.team.id].pa += score.them;
-      
-      const newSchedule = newAllSchedules[prev.team.id];
-      
-      playBuzzer();
-      setTimeout(() => setGameAnimation(null), 800);
-      
-      return {
-        ...prev,
-        wins: won ? prev.wins + 1 : prev.wins,
-        losses: !won ? prev.losses + 1 : prev.losses,
-        week: prev.week + 1,
-        schedule: newSchedule,
-        allSchedules: newAllSchedules,
-        teamRecords: newTeamRecords,
-        playerStats: newPlayerStats,
-        notifications: [newNotif, ...prev.notifications],
-      };
+      newPlayerStats[player.id].gamesPlayed++;
+      newPlayerStats[player.id].totalPoints += gameStats.points;
+      newPlayerStats[player.id].totalRebounds += gameStats.rebounds;
+      newPlayerStats[player.id].totalAssists += gameStats.assists;
+      newPlayerStats[player.id].totalSteals += gameStats.steals;
+      newPlayerStats[player.id].totalBlocks += gameStats.blocks;
+      newPlayerStats[player.id].gameLog.push(gameStats);
     });
-  }, []);
-
+    
+    const oppRoster = prev.allRosters[opponent.id] || [];
+    oppRoster.forEach(player => {
+      const isStarter = oppRoster.indexOf(player) < 5;
+      const gameStats = generatePlayerGameStats(player, isStarter, !won);
+      
+      if (!newPlayerStats[player.id]) {
+        newPlayerStats[player.id] = {
+          gamesPlayed: 0,
+          totalPoints: 0,
+          totalRebounds: 0,
+          totalAssists: 0,
+          totalSteals: 0,
+          totalBlocks: 0,
+          gameLog: [],
+        };
+      }
+      
+      newPlayerStats[player.id].gamesPlayed++;
+      newPlayerStats[player.id].totalPoints += gameStats.points;
+      newPlayerStats[player.id].totalRebounds += gameStats.rebounds;
+      newPlayerStats[player.id].totalAssists += gameStats.assists;
+      newPlayerStats[player.id].totalSteals += gameStats.steals;
+      newPlayerStats[player.id].totalBlocks += gameStats.blocks;
+      newPlayerStats[player.id].gameLog.push(gameStats);
+    });
+    
+    const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
+    const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
+    
+    // Update ALL schedules
+    const newAllSchedules = { ...prev.allSchedules };
+    
+    // Update YOUR game
+    newAllSchedules[prev.team.id] = prev.schedule.map(g => 
+      g.id === nextGame.id ? { ...g, played: true, won, score } : g
+    );
+    
+    const newSchedule = newAllSchedules[prev.team.id];
+    
+    // Simulate OTHER games on SAME DATE
+    const gameDate = nextGame.date;
+    NBA_TEAMS.forEach(otherTeam => {
+      if (otherTeam.id === prev.team.id) return;
+      
+      if (!newAllSchedules[otherTeam.id]) {
+        newAllSchedules[otherTeam.id] = prev.allSchedules[otherTeam.id] || [];
+      }
+      
+      const teamSchedule = newAllSchedules[otherTeam.id];
+      const gamesOnSameDay = teamSchedule.filter(g => g.date === gameDate && !g.played);
+      
+      gamesOnSameDay.forEach(game => {
+        const oppTeam = NBA_TEAMS.find(t => t.abbr === game.opponent);
+        if (!oppTeam) return;
+        
+        const teamRating = otherTeam.rating;
+        const oppTeamRating = oppTeam.rating;
+        const teamHomeBonus = game.isHome ? 2 : -2;
+        const adjustedTeamRating = teamRating + teamHomeBonus;
+        const adjustedOppTeamRating = oppTeamRating - teamHomeBonus;
+        
+        const totalTeamRating = adjustedTeamRating + adjustedOppTeamRating;
+        const teamWinProb = adjustedTeamRating / totalTeamRating;
+        const teamWon = random() < teamWinProb;
+        
+        const teamBaseScore = 100 + ((teamRating - 70) * 0.8);
+        const teamScore = Math.round(teamBaseScore + (random() - 0.5) * 20);
+        const oppBaseScore = 100 + ((oppTeamRating - 70) * 0.8);
+        const oppScore = Math.round(oppBaseScore + (random() - 0.5) * 20);
+        
+        const finalTeamScore = teamWon ? Math.max(oppScore + 1, teamScore) : Math.min(oppScore - 1, teamScore);
+        const finalOppScore = teamWon ? oppScore : Math.max(finalTeamScore + 1, oppScore);
+        
+        const teamGameScore = { us: finalTeamScore, them: finalOppScore };
+        
+        // Update both teams' schedules
+        newAllSchedules[otherTeam.id] = teamSchedule.map(g => 
+          g.id === game.id ? { ...g, played: true, won: teamWon, score: teamGameScore } : g
+        );
+        
+        // Update opponent's schedule too
+        const oppSchedule = newAllSchedules[oppTeam.id] || prev.allSchedules[oppTeam.id] || [];
+        const oppGame = oppSchedule.find(g => g.date === gameDate && g.opponent === otherTeam.abbr && !g.played);
+        if (oppGame) {
+          newAllSchedules[oppTeam.id] = oppSchedule.map(g =>
+            g.id === oppGame.id ? { ...g, played: true, won: !teamWon, score: { us: finalOppScore, them: finalTeamScore } } : g
+          );
+        }
+      });
+    });
+    
+    playBuzzer();
+    setTimeout(() => setGameAnimation(null), 800);
+    
+    return {
+      ...prev,
+      wins: won ? prev.wins + 1 : prev.wins,
+      losses: !won ? prev.losses + 1 : prev.losses,
+      week: prev.week + 1,
+      schedule: newSchedule,
+      allSchedules: newAllSchedules,
+      playerStats: newPlayerStats,
+      notifications: [newNotif, ...prev.notifications],
+    };
+  });
+}, []);
   const executeTrade = useCallback((trade) => {
     setGameState(prev => {
       if (!prev) return prev;
