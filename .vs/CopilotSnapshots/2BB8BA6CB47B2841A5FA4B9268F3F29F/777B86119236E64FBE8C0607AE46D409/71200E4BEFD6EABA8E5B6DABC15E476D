@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateLeagueSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -386,51 +386,35 @@ const simulateGame = useCallback(() => {
     const newLeagueSchedule = [...prev.leagueSchedule];
     const newPlayerStats = { ...prev.playerStats };
 
-    // CORRECT APPROACH: Only simulate games needed to keep everyone at YOUR CURRENT level
-    // Then simulate everyone's next game together (including yours)
-
+    // NEW APPROACH: Simulate by game number, not date
+    // Count how many games the user has played
     const userGamesPlayed = prev.schedule.filter(g => g.played).length;
+    const targetGameNumber = userGamesPlayed + 1; // After this sim, user will have this many
 
-    // Step 1: Bring all teams UP TO your current level (catch-up phase)
-    const catchUpGames = [];
+    // For each team, simulate their next unplayed game until they reach targetGameNumber
+    const gamesToSimulate = [];
 
     NBA_TEAMS.forEach(team => {
       const teamSchedule = prev.teamSchedules[team.id] || [];
       const teamGamesPlayed = teamSchedule.filter(g => g.played).length;
+      const gamesNeeded = targetGameNumber - teamGamesPlayed;
 
-      if (teamGamesPlayed < userGamesPlayed) {
-        // This team is behind, catch them up
-        const gamesNeeded = userGamesPlayed - teamGamesPlayed;
+      if (gamesNeeded > 0) {
+        // Get this team's next N unplayed games
         const teamNextGames = teamSchedule
           .filter(g => !g.played)
           .slice(0, gamesNeeded);
 
+        // Add these game IDs to our simulation list
         teamNextGames.forEach(tg => {
+          // Find the actual game in league schedule
           const leagueGame = newLeagueSchedule.find(g => g.id === tg.id);
-          if (leagueGame && !leagueGame.played && !catchUpGames.some(cg => cg.id === leagueGame.id)) {
-            catchUpGames.push(leagueGame);
+          if (leagueGame && !leagueGame.played && !gamesToSimulate.includes(leagueGame)) {
+            gamesToSimulate.push(leagueGame);
           }
         });
       }
     });
-
-    // Step 2: Now simulate everyone's NEXT game (including yours)
-    const nextRoundGames = [];
-
-    NBA_TEAMS.forEach(team => {
-      const teamSchedule = prev.teamSchedules[team.id] || [];
-      const nextGame = teamSchedule.find(g => !g.played);
-
-      if (nextGame) {
-        const leagueGame = newLeagueSchedule.find(g => g.id === nextGame.id);
-        if (leagueGame && !leagueGame.played && !nextRoundGames.some(ng => ng.id === leagueGame.id)) {
-          nextRoundGames.push(leagueGame);
-        }
-      }
-    });
-
-    // Combine: catch-up games first, then next round
-    const gamesToSimulate = [...catchUpGames, ...nextRoundGames];
 
     // Simulate ALL these games
     gamesToSimulate.forEach(game => {

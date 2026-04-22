@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState } from 'react';
 import { useGame } from '../hooks/useGameState';
 import GameSimAnimation from '../components/GameSimAnimation';
 import BoxScore from '../components/BoxScore';
@@ -9,20 +9,19 @@ export default function Schedule() {
   const [selectedGame, setSelectedGame] = useState(null);
   const [currentMonth, setCurrentMonth] = useState('Oct');
 
-  if (!gameState || !gameState.schedule) {
+  if (!gameState) {
     return <div className="page-title">Loading...</div>;
   }
 
   const { schedule } = gameState;
 
-  // Memoize stats calculation
-  const stats = useMemo(() => ({
+  const stats = {
     total: schedule.length,
     played: schedule.filter(g => g.played).length,
     wins: schedule.filter(g => g.played && g.won).length,
     losses: schedule.filter(g => g.played && !g.won).length,
     remaining: schedule.filter(g => !g.played).length,
-  }), [schedule]);
+  };
 
   const handleSimMultiple = (count) => {
     for (let i = 0; i < count; i++) {
@@ -38,13 +37,10 @@ export default function Schedule() {
 
   // Group games by month
   const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-  const gamesByMonth = useMemo(() => 
-    months.reduce((acc, month) => {
-      acc[month] = schedule.filter(g => g.date && g.date.startsWith(month));
-      return acc;
-    }, {}),
-    [schedule, months]
-  );
+  const gamesByMonth = months.reduce((acc, month) => {
+    acc[month] = schedule.filter(g => g.date.startsWith(month));
+    return acc;
+  }, {});
 
   const currentMonthGames = gamesByMonth[currentMonth] || [];
 
@@ -145,7 +141,7 @@ export default function Schedule() {
             <p>No games scheduled in {currentMonth}</p>
           </div>
         ) : (
-          currentMonthGames.map((game) => (
+          currentMonthGames.map((game, idx) => (
             <div key={game.id} className="game-card-wrapper">
               <div
                 className={`game-card ${game.played ? 'played' : 'upcoming'} ${
@@ -157,7 +153,7 @@ export default function Schedule() {
               >
                 {/* Game Header */}
                 <div className="game-card-header">
-                  <div className="game-date">{game.date || 'TBD'}</div>
+                  <div className="game-date">{game.date}</div>
                   <div className="game-location">
                     {game.isHome ? (
                       <span className="location-badge home">HOME</span>
@@ -171,8 +167,8 @@ export default function Schedule() {
                 <div className="game-card-body">
                   <div className="opponent-logo">{game.isHome ? '🏠' : '✈️'}</div>
                   <div className="opponent-details">
-                    <div className="opponent-abbr">{game.opponent || 'TBD'}</div>
-                    <div className="opponent-name-small">{game.oppName || ''}</div>
+                    <div className="opponent-abbr">{game.opponent}</div>
+                    <div className="opponent-name-small">{game.oppName}</div>
                   </div>
                 </div>
 
@@ -183,13 +179,11 @@ export default function Schedule() {
                       <div className={`result-indicator ${game.won ? 'win' : 'loss'}`}>
                         {game.won ? 'W' : 'L'}
                       </div>
-                      {game.score && (
-                        <div className="final-score">
-                          <span className={game.won ? 'winner' : 'loser'}>{game.score.us}</span>
-                          <span className="score-sep">-</span>
-                          <span className={!game.won ? 'winner' : 'loser'}>{game.score.them}</span>
-                        </div>
-                      )}
+                      <div className="final-score">
+                        <span className={game.won ? 'winner' : 'loser'}>{game.score.us}</span>
+                        <span className="score-sep">-</span>
+                        <span className={!game.won ? 'winner' : 'loser'}>{game.score.them}</span>
+                      </div>
                       {game.boxScore && (
                         <div className="view-box">
                           {selectedGame?.id === game.id ? '▼' : '▶'}
@@ -207,7 +201,7 @@ export default function Schedule() {
               </div>
 
               {/* Expanded Box Score */}
-              {selectedGame?.id === game.id && game.boxScore && (
+              {selectedGame?.id === game.id && (
                 <div className="expanded-boxscore">
                   <BoxScore game={game} />
                 </div>
