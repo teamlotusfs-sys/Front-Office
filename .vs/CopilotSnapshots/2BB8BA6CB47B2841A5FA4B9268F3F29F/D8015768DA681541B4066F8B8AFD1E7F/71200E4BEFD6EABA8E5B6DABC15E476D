@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateLeagueSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -12,6 +12,13 @@ function random() {
     return arr[0] / 4294967296;
   }
   return Math.random();
+}
+
+function parseDate(dateStr) {
+  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+  const [month, day] = dateStr.split(' ');
+  const monthIndex = months.indexOf(month);
+  return monthIndex * 100 + parseInt(day);
 }
 
 function calculateAvailableCap(roster) {
