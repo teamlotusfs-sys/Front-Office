@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateLeagueSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -306,6 +306,14 @@ const simulateGame = useCallback(() => {
       setGameAnimation(null);
       return { ...prev, notifications: [newNotif, ...prev.notifications] };
     }
+
+    // Helper to parse dates for comparison
+    const parseDateForComparison = (dateStr) => {
+      const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+      const [month, day] = dateStr.split(' ');
+      const monthIndex = months.indexOf(month);
+      return monthIndex * 100 + parseInt(day);
+    };
 
     // Helper functions
     const calculateTeamRating = (roster) => {
