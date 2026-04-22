@@ -5,10 +5,38 @@ import './Standings.css';
 
 export default function Standings() {
   const { gameState } = useGame();
-  const { team, teamRecords } = gameState;
   const [conf, setConf] = useState('All');
 
-  // Build standings from team records
+  if (!gameState) {
+    return <div className="page-title">Loading...</div>;
+  }
+
+  const { team, allSchedules } = gameState;
+
+  // Calculate records from allSchedules (not teamRecords)
+  const teamRecords = {};
+  NBA_TEAMS.forEach(t => {
+    teamRecords[t.id] = { w: 0, l: 0, pf: 0, pa: 0 };
+  });
+
+  // Count played games from ALL teams' schedules
+  NBA_TEAMS.forEach(t => {
+    if (allSchedules[t.id]) {
+      allSchedules[t.id].forEach(g => {
+        if (g.played) {
+          if (g.won) {
+            teamRecords[t.id].w++;
+          } else {
+            teamRecords[t.id].l++;
+          }
+          teamRecords[t.id].pf += g.score.us;
+          teamRecords[t.id].pa += g.score.them;
+        }
+      });
+    }
+  });
+
+  // Build standings
   const allStandings = NBA_TEAMS.map(t => ({
     ...t,
     w: teamRecords[t.id].w,
@@ -20,12 +48,11 @@ export default function Standings() {
   // Filter by conference
   const filtered = allStandings.filter(t => conf === 'All' || t.conf === conf);
 
-  // Sort by win percentage
+  // Sort by win percentage, then point differential
   const sorted = filtered.sort((a, b) => {
     const pctA = a.w / (a.w + a.l) || 0;
     const pctB = b.w / (b.w + b.l) || 0;
     if (pctB !== pctA) return pctB - pctA;
-    // Tiebreaker: head to head, then point differential
     return (b.pf - b.pa) - (a.pf - a.pa);
   });
 
