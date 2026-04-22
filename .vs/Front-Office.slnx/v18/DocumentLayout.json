@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\hooks\\useGameState.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\pages\\ScheduleNew.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\pages\\ScheduleNew.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
@@ -27,10 +31,6 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\data\\playerStatsHelpers.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\hooks\\useGameState.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\components\\BoxScore.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\components\\BoxScore.jsx||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
@@ -46,7 +46,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -62,21 +62,18 @@
               "RelativeToolTip": "src\\pages\\ScheduleNew.css",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAMgBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-22T16:02:19.377Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T16:02:19.377Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ScheduleNew.jsx",
               "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\pages\\ScheduleNew.jsx",
               "RelativeDocumentMoniker": "src\\pages\\ScheduleNew.jsx",
               "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\pages\\ScheduleNew.jsx",
               "RelativeToolTip": "src\\pages\\ScheduleNew.jsx",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAANcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
-              "WhenOpened": "2026-04-22T16:00:47.412Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T16:00:47.412Z"
             },
             {
               "$type": "Document",
@@ -88,25 +85,24 @@
               "RelativeToolTip": "src\\components\\BoxScore.jsx",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
-              "WhenOpened": "2026-04-22T15:58:44.079Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:58:44.079Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 0,
               "Title": "useGameState.js",
               "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js",
               "RelativeDocumentMoniker": "src\\hooks\\useGameState.js",
               "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js",
               "RelativeToolTip": "src\\hooks\\useGameState.js",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAOQAAAAAAAAAAAAowAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
               "WhenOpened": "2026-04-22T15:58:44.037Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "playerStatsHelpers.js",
               "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\data\\playerStatsHelpers.js",
               "RelativeDocumentMoniker": "src\\data\\playerStatsHelpers.js",
@@ -114,12 +110,11 @@
               "RelativeToolTip": "src\\data\\playerStatsHelpers.js",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T15:58:43.993Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:58:43.993Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "Schedule.css",
               "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\pages\\Schedule.css",
               "RelativeDocumentMoniker": "src\\pages\\Schedule.css",
@@ -127,12 +122,11 @@
               "RelativeToolTip": "src\\pages\\Schedule.css",
               "ViewState": "AgIAAJwBAAAAAAAAAABRwAAAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-22T15:58:08.433Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:58:08.433Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Schedule.jsx",
               "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\pages\\Schedule.jsx",
               "RelativeDocumentMoniker": "src\\pages\\Schedule.jsx",
@@ -140,12 +134,11 @@
               "RelativeToolTip": "src\\pages\\Schedule.jsx",
               "ViewState": "AgIAAAAAAAAAAAAAAEBVwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
-              "WhenOpened": "2026-04-22T15:57:48.313Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:57:48.313Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "BoxScore.css",
               "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\components\\BoxScore.css",
               "RelativeDocumentMoniker": "src\\components\\BoxScore.css",
@@ -153,12 +146,11 @@
               "RelativeToolTip": "src\\components\\BoxScore.css",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAL4AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-22T15:57:24.727Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:57:24.727Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "index.html",
               "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\public\\index.html",
               "RelativeDocumentMoniker": "public\\index.html",
@@ -166,8 +158,7 @@
               "RelativeToolTip": "public\\index.html",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001512|",
-              "WhenOpened": "2026-04-22T15:44:41.798Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:44:41.798Z"
             }
           ]
         }

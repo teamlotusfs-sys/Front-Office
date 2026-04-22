@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generatePlayerGameStats, generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -237,102 +237,60 @@ const simulateGame = useCallback(() => {
     const finalYourScore = won ? Math.max(oppScore + 1, yourScore) : Math.min(oppScore - 1, yourScore);
     const finalOppScore = won ? oppScore : Math.max(finalYourScore + 1, oppScore);
     const score = { us: finalYourScore, them: finalOppScore };
-
-    // Generate box scores for both teams
-    const yourPlayersWithMinutes = activePlayers.map(p => ({
-      ...p,
-      requestedMinutes: rotations.minutesAlloc[p.id] || (rotations.starters.includes(p) ? 32 : 12)
-    }));
-    const yourBoxScore = generateTeamBoxScore(yourPlayersWithMinutes, finalYourScore, won);
-
-    const oppRoster = prev.allRosters[opponent.id] || [];
-    const oppBoxScore = generateTeamBoxScore(oppRoster, finalOppScore, !won);
-
-    // Update player season stats
+    
+    // Generate stats
     const newPlayerStats = { ...prev.playerStats };
-
-    yourBoxScore.forEach(stat => {
-      if (!newPlayerStats[stat.playerId]) {
-        newPlayerStats[stat.playerId] = {
+    
+    activePlayers.forEach(player => {
+      const isStarter = rotations.starters.includes(player);
+      const minutes = rotations.minutesAlloc[player.id] || (isStarter ? 32 : 12);
+      const gameStats = generatePlayerGameStats(player, isStarter, won, minutes);
+      
+      if (!newPlayerStats[player.id]) {
+        newPlayerStats[player.id] = {
           gamesPlayed: 0,
           totalPoints: 0,
           totalRebounds: 0,
           totalAssists: 0,
           totalSteals: 0,
           totalBlocks: 0,
-          totalFGM: 0,
-          totalFGA: 0,
-          totalTPM: 0,
-          totalTPA: 0,
-          totalFTM: 0,
-          totalFTA: 0,
-          totalTurnovers: 0,
           gameLog: [],
         };
       }
-
-      if (stat.minutes > 0) {
-        newPlayerStats[stat.playerId].gamesPlayed++;
-        newPlayerStats[stat.playerId].totalPoints += stat.points;
-        newPlayerStats[stat.playerId].totalRebounds += stat.rebounds;
-        newPlayerStats[stat.playerId].totalAssists += stat.assists;
-        newPlayerStats[stat.playerId].totalSteals += stat.steals;
-        newPlayerStats[stat.playerId].totalBlocks += stat.blocks;
-        newPlayerStats[stat.playerId].totalFGM += stat.fgm;
-        newPlayerStats[stat.playerId].totalFGA += stat.fga;
-        newPlayerStats[stat.playerId].totalTPM += stat.tpm;
-        newPlayerStats[stat.playerId].totalTPA += stat.tpa;
-        newPlayerStats[stat.playerId].totalFTM += stat.ftm;
-        newPlayerStats[stat.playerId].totalFTA += stat.fta;
-        newPlayerStats[stat.playerId].totalTurnovers += stat.turnovers;
-        newPlayerStats[stat.playerId].gameLog.push({
-          date: nextGame.date,
-          opponent: opponent.abbr,
-          ...stat
-        });
-      }
+      
+      newPlayerStats[player.id].gamesPlayed++;
+      newPlayerStats[player.id].totalPoints += gameStats.points;
+      newPlayerStats[player.id].totalRebounds += gameStats.rebounds;
+      newPlayerStats[player.id].totalAssists += gameStats.assists;
+      newPlayerStats[player.id].totalSteals += gameStats.steals;
+      newPlayerStats[player.id].totalBlocks += gameStats.blocks;
+      newPlayerStats[player.id].gameLog.push(gameStats);
     });
-
-    oppBoxScore.forEach(stat => {
-      if (!newPlayerStats[stat.playerId]) {
-        newPlayerStats[stat.playerId] = {
+    
+    const oppRoster = prev.allRosters[opponent.id] || [];
+    oppRoster.forEach(player => {
+      const isStarter = oppRoster.indexOf(player) < 5;
+      const gameStats = generatePlayerGameStats(player, isStarter, !won);
+      
+      if (!newPlayerStats[player.id]) {
+        newPlayerStats[player.id] = {
           gamesPlayed: 0,
           totalPoints: 0,
           totalRebounds: 0,
           totalAssists: 0,
           totalSteals: 0,
           totalBlocks: 0,
-          totalFGM: 0,
-          totalFGA: 0,
-          totalTPM: 0,
-          totalTPA: 0,
-          totalFTM: 0,
-          totalFTA: 0,
-          totalTurnovers: 0,
           gameLog: [],
         };
       }
-
-      if (stat.minutes > 0) {
-        newPlayerStats[stat.playerId].gamesPlayed++;
-        newPlayerStats[stat.playerId].totalPoints += stat.points;
-        newPlayerStats[stat.playerId].totalRebounds += stat.rebounds;
-        newPlayerStats[stat.playerId].totalAssists += stat.assists;
-        newPlayerStats[stat.playerId].totalSteals += stat.steals;
-        newPlayerStats[stat.playerId].totalBlocks += stat.blocks;
-        newPlayerStats[stat.playerId].totalFGM += stat.fgm;
-        newPlayerStats[stat.playerId].totalFGA += stat.fga;
-        newPlayerStats[stat.playerId].totalTPM += stat.tpm;
-        newPlayerStats[stat.playerId].totalTPA += stat.tpa;
-        newPlayerStats[stat.playerId].totalFTM += stat.ftm;
-        newPlayerStats[stat.playerId].totalFTA += stat.fta;
-        newPlayerStats[stat.playerId].totalTurnovers += stat.turnovers;
-        newPlayerStats[stat.playerId].gameLog.push({
-          date: nextGame.date,
-          opponent: prev.team.abbr,
-          ...stat
-        });
-      }
+      
+      newPlayerStats[player.id].gamesPlayed++;
+      newPlayerStats[player.id].totalPoints += gameStats.points;
+      newPlayerStats[player.id].totalRebounds += gameStats.rebounds;
+      newPlayerStats[player.id].totalAssists += gameStats.assists;
+      newPlayerStats[player.id].totalSteals += gameStats.steals;
+      newPlayerStats[player.id].totalBlocks += gameStats.blocks;
+      newPlayerStats[player.id].gameLog.push(gameStats);
     });
 
     const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
