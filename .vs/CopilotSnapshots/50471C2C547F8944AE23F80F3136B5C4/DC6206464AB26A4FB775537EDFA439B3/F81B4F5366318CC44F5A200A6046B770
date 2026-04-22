@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import './BoxScore.css';
 
 export default function BoxScore({ game }) {
@@ -14,6 +14,8 @@ export default function BoxScore({ game }) {
 
   const { boxScore, score } = game;
   const displayStats = activeTeam === 'home' ? boxScore.home : boxScore.away;
+  const teamName = activeTeam === 'home' ? boxScore.homeTeam : boxScore.awayTeam;
+  const teamScore = activeTeam === 'home' ? score.us : score.them;
 
   // Calculate team totals
   const totals = displayStats.reduce((acc, stat) => ({

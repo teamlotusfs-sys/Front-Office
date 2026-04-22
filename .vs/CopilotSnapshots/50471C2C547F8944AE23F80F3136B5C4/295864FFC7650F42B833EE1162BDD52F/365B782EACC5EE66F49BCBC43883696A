@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useGame, formatSalary, ovrColor } from '../hooks/useGameState';
 
 export default function Dashboard() {
@@ -101,9 +101,9 @@ export default function Dashboard() {
                 <td><span style={{ fontFamily: 'DM Mono, monospace', fontWeight: 700, color: ovrColor(p.ovr) }}>{p.ovr}</span></td>
                 <td className="muted mono">{p.pot}</td>
                 <td className="muted">{p.age}</td>
-                <td className="mono">{p.ppg}</td>
-                <td className="mono">{p.rpg}</td>
-                <td className="mono">{p.apg}</td>
+                <td className="mono">{p.stats.ppg}</td>
+                <td className="mono">{p.stats.rpg}</td>
+                <td className="mono">{p.stats.apg}</td>
                 <td className="muted mono" style={{ fontSize: 12 }}>{formatSalary(p.salary)}</td>
               </tr>
             ))}
