@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useGame } from '../hooks/useGameState';
 import GameSimAnimation from '../components/GameSimAnimation';
 import BoxScore from '../components/BoxScore';
@@ -9,8 +9,11 @@ export default function Schedule() {
   const [selectedGame, setSelectedGame] = useState(null);
   const [currentMonth, setCurrentMonth] = useState('Oct');
 
-  // Get schedule early (before hooks)
-  const schedule = gameState?.schedule || [];
+  if (!gameState || !gameState.schedule) {
+    return <div className="page-title">Loading...</div>;
+  }
+
+  const { schedule } = gameState;
 
   // Memoize stats calculation
   const stats = useMemo(() => ({
@@ -40,18 +43,13 @@ export default function Schedule() {
       acc[month] = schedule.filter(g => g.date && g.date.startsWith(month));
       return acc;
     }, {}),
-    [schedule]
+    [schedule, months]
   );
 
   const currentMonthGames = gamesByMonth[currentMonth] || [];
 
   // Get next unplayed game for quick sim
   const nextGame = schedule.find(g => !g.played);
-
-  // Early return AFTER all hooks
-  if (!gameState || !gameState.schedule) {
-    return <div className="page-title">Loading...</div>;
-  }
 
   return (
     <div className="schedule-page">
