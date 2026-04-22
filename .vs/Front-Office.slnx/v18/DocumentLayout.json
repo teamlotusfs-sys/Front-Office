@@ -102,11 +102,24 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 1,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "useGameState.js",
+              "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js",
+              "RelativeDocumentMoniker": "src\\hooks\\useGameState.js",
+              "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js",
+              "RelativeToolTip": "src\\hooks\\useGameState.js",
+              "ViewState": "AgIAABQBAAAAAAAAAAAgwF4BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2026-04-22T15:58:44.037Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -118,8 +131,7 @@
               "RelativeToolTip": "PRE_DEPLOYMENT_REVIEW.md",
               "ViewState": "AgIAADABAAAAAAAAAAAAAFQBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
-              "WhenOpened": "2026-04-22T21:58:45.836Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T21:58:45.836Z"
             },
             {
               "$type": "Document",
@@ -180,19 +192,6 @@
               "ViewState": "AgIAAPQAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
               "WhenOpened": "2026-04-22T16:50:41.891Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "useGameState.js",
-              "DocumentMoniker": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js",
-              "RelativeDocumentMoniker": "src\\hooks\\useGameState.js",
-              "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js",
-              "RelativeToolTip": "src\\hooks\\useGameState.js",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAFYBAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T15:58:44.037Z",
-              "EditorCaption": ""
             },
             {
               "$type": "Document",

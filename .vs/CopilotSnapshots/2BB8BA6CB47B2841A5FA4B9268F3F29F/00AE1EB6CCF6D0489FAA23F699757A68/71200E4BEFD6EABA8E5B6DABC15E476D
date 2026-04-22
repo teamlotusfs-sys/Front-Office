@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateLeagueSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -293,7 +293,7 @@ const simulateGame = useCallback(() => {
     }
 
     // Get the date of the user's next game
-    const targetDate = myNextGame.date;
+    const gameDate = myNextGame.date;
 
     setGameAnimation({ game: myNextGame, progress: 1, total: prev.schedule.filter(g => !g.played).length });
 
@@ -306,14 +306,6 @@ const simulateGame = useCallback(() => {
       setGameAnimation(null);
       return { ...prev, notifications: [newNotif, ...prev.notifications] };
     }
-
-    // Helper to parse dates for comparison
-    const parseDateForComparison = (dateStr) => {
-      const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-      const [month, day] = dateStr.split(' ');
-      const monthIndex = months.indexOf(month);
-      return monthIndex * 100 + parseInt(day);
-    };
 
     // Helper functions
     const calculateTeamRating = (roster) => {
@@ -349,7 +341,7 @@ const simulateGame = useCallback(() => {
       );
     };
 
-    const calculateWinProbability = (homeRating, awayRating, homeTeamId, awayTeamId, homeSchedule, awaySchedule, leagueSchedule, gameDate) => {
+    const calculateWinProbability = (homeRating, awayRating, homeTeamId, awayTeamId, homeSchedule, awaySchedule, leagueSchedule) => {
       // Base rating difference
       let homeAdvantage = (homeRating - awayRating) / 15;
 
@@ -394,20 +386,11 @@ const simulateGame = useCallback(() => {
     const newLeagueSchedule = [...prev.leagueSchedule];
     const newPlayerStats = { ...prev.playerStats };
 
-    // CRITICAL FIX: Simulate ALL games up to and including the target date
-    // Not just games ON the target date
-    const targetDateValue = parseDateForComparison(targetDate);
-    const currentDateValue = parseDateForComparison(prev.currentDate);
+    // Get all games on this date
+    const gamesOnDate = newLeagueSchedule.filter(g => g.date === gameDate && !g.played);
 
-    // Get all unplayed games between current date and target date (inclusive)
-    const gamesToSimulate = newLeagueSchedule.filter(g => {
-      if (g.played) return false;
-      const gameDate = parseDateForComparison(g.date);
-      return gameDate >= currentDateValue && gameDate <= targetDateValue;
-    });
-
-    // Simulate ALL these games
-    gamesToSimulate.forEach(game => {
+    // Simulate ALL games on this date
+    gamesOnDate.forEach(game => {
       const homeTeam = NBA_TEAMS.find(t => t.id === game.homeTeam);
       const awayTeam = NBA_TEAMS.find(t => t.id === game.awayTeam);
 
@@ -447,8 +430,7 @@ const simulateGame = useCallback(() => {
         homeRating, awayRating, 
         game.homeTeam, game.awayTeam,
         homeSchedule, awaySchedule,
-        prev.leagueSchedule,
-        game.date
+        prev.leagueSchedule
       );
 
       const homeWon = random() < homeWinProb;
@@ -567,7 +549,7 @@ const simulateGame = useCallback(() => {
 
     // Find next game date
     const remainingGames = newLeagueSchedule.filter(g => !g.played);
-    const nextDate = remainingGames.length > 0 ? remainingGames[0].date : targetDate;
+    const nextDate = remainingGames.length > 0 ? remainingGames[0].date : gameDate;
 
     playBuzzer();
     setTimeout(() => setGameAnimation(null), 800);
