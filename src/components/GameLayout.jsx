@@ -30,7 +30,7 @@ export default function GameLayout() {
       <aside className="sidebar">
         <div className="sidebar-brand">
           <span className="sidebar-logo">🏀</span>
-          <span className="sidebar-app-name">REBUILD<span className="accent">MODE</span></span>
+          <span className="sidebar-app-name">FRONT<span className="accent">OFFICE</span></span>
         </div>
 
         <div className="sidebar-team">
