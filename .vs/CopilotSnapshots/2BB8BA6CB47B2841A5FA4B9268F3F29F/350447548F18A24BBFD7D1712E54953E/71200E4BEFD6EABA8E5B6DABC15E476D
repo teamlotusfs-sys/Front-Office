@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateLeagueSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -394,15 +394,16 @@ const simulateGame = useCallback(() => {
     const newLeagueSchedule = [...prev.leagueSchedule];
     const newPlayerStats = { ...prev.playerStats };
 
-    // CRITICAL FIX: Simulate ALL unplayed games up to and including target date
-    // This ensures all teams progress together
+    // CRITICAL FIX: Simulate ALL games up to and including the target date
+    // Not just games ON the target date
     const targetDateValue = parseDateForComparison(targetDate);
+    const currentDateValue = parseDateForComparison(prev.currentDate);
 
-    // Get all unplayed games that should have happened by now (up to target date)
+    // Get all unplayed games between current date and target date (inclusive)
     const gamesToSimulate = newLeagueSchedule.filter(g => {
       if (g.played) return false;
       const gameDate = parseDateForComparison(g.date);
-      return gameDate <= targetDateValue;
+      return gameDate >= currentDateValue && gameDate <= targetDateValue;
     });
 
     // Simulate ALL these games
