@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
@@ -147,6 +147,29 @@ export default function StartGame() {
         console.error('Failed to start game:', error);
         setLoading(false);
       }
+    }
+  };
+
+  const handleLoadSave = (saveKey) => {
+    setLoading(true);
+    try {
+      const saveData = JSON.parse(localStorage.getItem(saveKey));
+      // Load the game state (you'll need to add a loadGame function)
+      startGame(saveData.teamId, saveData.gmName);
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 100);
+    } catch (error) {
+      console.error('Failed to load save:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteSave = (saveKey, e) => {
+    e.stopPropagation();
+    if (window.confirm('Delete this save? This cannot be undone.')) {
+      localStorage.removeItem(saveKey);
+      setSavedGames(savedGames.filter(s => s.key !== saveKey));
     }
   };
 
