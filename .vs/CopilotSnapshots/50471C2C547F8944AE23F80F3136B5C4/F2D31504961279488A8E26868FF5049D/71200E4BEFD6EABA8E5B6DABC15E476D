@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -463,16 +463,6 @@ const simulateGame = useCallback(() => {
         const oppTeam = NBA_TEAMS.find(t => t.abbr === game.opponent);
         if (!oppTeam) return;
 
-        // Skip if opponent schedule already shows this game as played (avoid duplicates)
-        if (!newAllSchedules[oppTeam.id]) {
-          newAllSchedules[oppTeam.id] = prev.allSchedules[oppTeam.id] || [];
-        }
-        const oppSchedule = newAllSchedules[oppTeam.id];
-        const oppGame = oppSchedule.find(g => g.date === game.date && g.opponent === otherTeam.abbr);
-        if (oppGame && oppGame.played) {
-          return; // Already simulated from opponent's perspective
-        }
-
         // Calculate ratings from actual rosters
         const teamRoster = prev.allRosters[otherTeam.id] || [];
         const teamRating = calculateTeamRating(teamRoster);
@@ -594,6 +584,8 @@ const simulateGame = useCallback(() => {
         );
 
         // Update opponent's schedule too
+        const oppSchedule = newAllSchedules[oppTeam.id] || prev.allSchedules[oppTeam.id] || [];
+        const oppGame = oppSchedule.find(g => g.date === game.date && g.opponent === otherTeam.abbr && !g.played);
         if (oppGame) {
           newAllSchedules[oppTeam.id] = oppSchedule.map(g =>
             g.id === oppGame.id ? { 
