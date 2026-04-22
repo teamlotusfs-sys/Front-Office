@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateLeagueSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -394,34 +394,15 @@ const simulateGame = useCallback(() => {
     const newLeagueSchedule = [...prev.leagueSchedule];
     const newPlayerStats = { ...prev.playerStats };
 
-    // NEW APPROACH: Simulate by game number, not date
-    // Count how many games the user has played
-    const userGamesPlayed = prev.schedule.filter(g => g.played).length;
-    const targetGameNumber = userGamesPlayed + 1; // After this sim, user will have this many
+    // CRITICAL FIX: Simulate ALL unplayed games up to and including target date
+    // This ensures all teams progress together
+    const targetDateValue = parseDateForComparison(targetDate);
 
-    // For each team, simulate their next unplayed game until they reach targetGameNumber
-    const gamesToSimulate = [];
-
-    NBA_TEAMS.forEach(team => {
-      const teamSchedule = prev.teamSchedules[team.id] || [];
-      const teamGamesPlayed = teamSchedule.filter(g => g.played).length;
-      const gamesNeeded = targetGameNumber - teamGamesPlayed;
-
-      if (gamesNeeded > 0) {
-        // Get this team's next N unplayed games
-        const teamNextGames = teamSchedule
-          .filter(g => !g.played)
-          .slice(0, gamesNeeded);
-
-        // Add these game IDs to our simulation list
-        teamNextGames.forEach(tg => {
-          // Find the actual game in league schedule
-          const leagueGame = newLeagueSchedule.find(g => g.id === tg.id);
-          if (leagueGame && !leagueGame.played && !gamesToSimulate.includes(leagueGame)) {
-            gamesToSimulate.push(leagueGame);
-          }
-        });
-      }
+    // Get all unplayed games that should have happened by now (up to target date)
+    const gamesToSimulate = newLeagueSchedule.filter(g => {
+      if (g.played) return false;
+      const gameDate = parseDateForComparison(g.date);
+      return gameDate <= targetDateValue;
     });
 
     // Simulate ALL these games
