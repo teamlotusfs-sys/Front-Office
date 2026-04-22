@@ -123,9 +123,10 @@
               "RelativeDocumentMoniker": "src\\data\\playerStatsHelpers.js",
               "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\data\\playerStatsHelpers.js",
               "RelativeToolTip": "src\\data\\playerStatsHelpers.js",
-              "ViewState": "AgIAACQAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAACkAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T15:58:43.993Z"
+              "WhenOpened": "2026-04-22T15:58:43.993Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -137,8 +138,7 @@
               "RelativeToolTip": "src\\pages\\Schedule.css",
               "ViewState": "AgIAAKEBAAAAAAAAAABBwAAAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-22T15:58:08.433Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:58:08.433Z"
             },
             {
               "$type": "Document",
@@ -160,7 +160,7 @@
               "RelativeDocumentMoniker": "src\\components\\BoxScore.css",
               "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\components\\BoxScore.css",
               "RelativeToolTip": "src\\components\\BoxScore.css",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAMYAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEQAAAAAAAAAAAAAAMkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
               "WhenOpened": "2026-04-22T15:57:24.727Z",
               "EditorCaption": ""

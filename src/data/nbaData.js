@@ -32,6 +32,15 @@ export const NBA_TEAMS = [
 ];
 
 const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
+
+// Secondary positions for positional flexibility
+const secondaryPositions = {
+  'PG': ['SG'],
+  'SG': ['PG', 'SF'],
+  'SF': ['SG', 'PF'],
+  'PF': ['SF', 'C'],
+  'C': ['PF']
+};
 const firstNames = ['Shai', 'Nikola', 'Giannis', 'Jayson', 'Luka', 'Anthony', 'Tyrese', 'Ja', 'Devin', 'Donovan', 'Trae', 'LaMelo', 'Paolo', 'Chet', 'Victor', 'Franz', 'Evan', 'Jordan', 'Marcus', 'Kyrie', 'Damian', 'CJ', 'Brandon', 'Khris', 'Bam', 'Jimmy', 'Tyler', 'Jaylen', 'Derrick', 'Ben', 'Joel', 'Jalen', 'Jamal', 'Anthony', 'Zion', 'Scottie', 'Cam', 'Darius', 'Tyler', 'Tyus', 'Luguentz', 'Keldon', 'Harrison', 'Cole', 'Austin', 'Josh', 'Saddiq'];
 const lastNames = ['Gilgeous-Alexander', 'Jokic', 'Antetokounmpo', 'Tatum', 'Doncic', 'Edwards', 'Haliburton', 'Morant', 'Booker', 'Mitchell', 'Young', 'Ball', 'Banchero', 'Holmgren', 'Wembanyama', 'Wagner', 'Turner', 'Poole', 'Smart', 'Irving', 'Lillard', 'McCollum', 'Ingram', 'Middleton', 'Adebayo', 'Butler', 'Herro', 'Brown', 'Rose', 'Simmons', 'Embiid', 'Green', 'Murray', 'Davis', 'Williamson', 'Barnes', 'Thomas', 'Sabonis', 'Maxey', 'Adams', 'Dort', 'Johnson', 'Barnes', 'Anthony', 'Reeves', 'Green', 'Bey'];
 
@@ -53,7 +62,14 @@ function random() {
 export function generatePlayer(teamId, overrides = {}) {
   const pos = positions[Math.floor(random() * positions.length)];
   const age = 21 + Math.floor(random() * 15);
-  
+
+  // Generate secondary position (70% chance to have one)
+  let secondaryPos = null;
+  if (random() < 0.7 && secondaryPositions[pos]) {
+    const secondaries = secondaryPositions[pos];
+    secondaryPos = secondaries[Math.floor(random() * secondaries.length)];
+  }
+
   let ovr;
   const rand = random();
   if (rand < 0.6) {
@@ -65,11 +81,11 @@ export function generatePlayer(teamId, overrides = {}) {
   } else {
     ovr = 91 + Math.floor(random() * 4);
   }
-  
+
   if (!teamId && ovr > 84) {
     ovr = 84;
   }
-  
+
   let baseSalary;
   if (ovr >= 90) {
     baseSalary = 45 + random() * 10;
@@ -84,7 +100,7 @@ export function generatePlayer(teamId, overrides = {}) {
   } else {
     baseSalary = 0.9 + random() * 1.1;
   }
-  
+
   const salary = Math.round(baseSalary * 1_000_000);
   const pot = Math.min(99, ovr + 3 + Math.floor(random() * 8));
   const yearsLeft = 1 + Math.floor(random() * 4);
@@ -94,6 +110,7 @@ export function generatePlayer(teamId, overrides = {}) {
     firstName: firstNames[Math.floor(random() * firstNames.length)],
     lastName: lastNames[Math.floor(random() * lastNames.length)],
     pos,
+    secondaryPos,
     age,
     ovr,
     pot,

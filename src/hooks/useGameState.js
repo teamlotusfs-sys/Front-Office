@@ -68,6 +68,13 @@ export function GameProvider({ children }) {
           totalAssists: 0,
           totalSteals: 0,
           totalBlocks: 0,
+          totalFGM: 0,
+          totalFGA: 0,
+          totalTPM: 0,
+          totalTPA: 0,
+          totalFTM: 0,
+          totalFTA: 0,
+          totalTurnovers: 0,
           gameLog: [],
         };
       });
@@ -165,6 +172,87 @@ export function GameProvider({ children }) {
       return {
         ...prev,
         rotations: { starters, bench, minutesAlloc },
+      };
+    });
+  }, []);
+
+  const autoSetRotations = useCallback(() => {
+    setGameState(prev => {
+      if (!prev || !prev.roster) return prev;
+
+      const positions = ['PG', 'SG', 'SF', 'PF', 'C'];
+      const sortedRoster = [...prev.roster].sort((a, b) => b.ovr - a.ovr);
+      const starters = Array(5).fill(null);
+      const bench = Array(8).fill(null);
+      const minutesAlloc = {};
+      const usedPlayers = new Set();
+
+      // Helper function to check if player can play position
+      const canPlayPosition = (player, position) => {
+        return player.pos === position || player.secondaryPos === position;
+      };
+
+      // First pass: Fill positions with primary position players (best OVR)
+      positions.forEach((pos, idx) => {
+        const player = sortedRoster.find(p => 
+          p.pos === pos && !usedPlayers.has(p.id)
+        );
+        if (player) {
+          starters[idx] = player;
+          usedPlayers.add(player.id);
+          minutesAlloc[player.id] = 32;
+        }
+      });
+
+      // Second pass: Fill remaining spots with secondary position players
+      positions.forEach((pos, idx) => {
+        if (!starters[idx]) {
+          const player = sortedRoster.find(p => 
+            canPlayPosition(p, pos) && !usedPlayers.has(p.id)
+          );
+          if (player) {
+            starters[idx] = player;
+            usedPlayers.add(player.id);
+            minutesAlloc[player.id] = 32;
+          }
+        }
+      });
+
+      // Third pass: If still empty, just use best available players
+      positions.forEach((pos, idx) => {
+        if (!starters[idx]) {
+          const player = sortedRoster.find(p => !usedPlayers.has(p.id));
+          if (player) {
+            starters[idx] = player;
+            usedPlayers.add(player.id);
+            minutesAlloc[player.id] = 32;
+          }
+        }
+      });
+
+      // Fill bench with next 8 best players
+      let benchIdx = 0;
+      for (const player of sortedRoster) {
+        if (benchIdx >= 8) break;
+        if (!usedPlayers.has(player.id)) {
+          bench[benchIdx] = player;
+          minutesAlloc[player.id] = 16;
+          usedPlayers.add(player.id);
+          benchIdx++;
+        }
+      }
+
+      const newNotif = { 
+        id: Date.now(), 
+        type: 'success', 
+        text: 'Rotations automatically set based on player OVR and positions', 
+        read: false 
+      };
+
+      return {
+        ...prev,
+        rotations: { starters, bench, minutesAlloc },
+        notifications: [newNotif, ...prev.notifications],
       };
     });
   }, []);
@@ -472,7 +560,7 @@ const simulateGame = useCallback(() => {
   }, []);
 
   return (
-    <GameContext.Provider value={{ gameState, gameAnimation, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade, updateRotations }}>
+    <GameContext.Provider value={{ gameState, gameAnimation, startGame, signFreeAgent, releasePlayer, markNotifRead, simulateGame, executeTrade, declineTrade, updateRotations, autoSetRotations }}>
       {children}
     </GameContext.Provider>
   );

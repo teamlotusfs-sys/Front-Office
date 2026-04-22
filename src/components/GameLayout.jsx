@@ -10,8 +10,9 @@ const NAV = [
   { to: '/trades', icon: '🔄', label: 'Trades' },
   { to: '/free-agents', icon: '✍️', label: 'Free Agents' },
   { to: '/schedule', icon: '📅', label: 'Schedule' },
-  { to: '/draft', icon: '🎯', label: 'Draft' },
   { to: '/standings', icon: '🏆', label: 'Standings' },
+  { to: '/leaders', icon: '🔥', label: 'League Leaders' },
+  { to: '/draft', icon: '🎯', label: 'Draft' },
 ];
 
 export default function GameLayout() {

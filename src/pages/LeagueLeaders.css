@@ -1,0 +1,297 @@
+.leaders-page {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.leaders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.leaders-header .page-title {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+}
+
+.leaders-header .page-subtitle {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* Category Tabs */
+.category-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.category-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.category-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.category-tab.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.category-icon {
+  font-size: 18px;
+}
+
+.category-label {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Leaders Table */
+.leaders-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.leaders-table-wrapper {
+  overflow-x: auto;
+}
+
+.leaders-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaders-table thead {
+  background: var(--bg-surface);
+  border-bottom: 2px solid var(--border);
+}
+
+.leaders-table th {
+  padding: 16px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+}
+
+.leaders-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+
+.leaders-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.leaders-table tbody tr.your-player {
+  background: rgba(232, 255, 71, 0.05);
+}
+
+.leaders-table tbody tr.your-player:hover {
+  background: rgba(232, 255, 71, 0.1);
+}
+
+.leaders-table td {
+  padding: 14px 12px;
+  font-size: 14px;
+}
+
+/* Column Widths */
+.rank-col {
+  width: 60px;
+  text-align: center;
+}
+
+.player-col {
+  min-width: 200px;
+}
+
+.team-col {
+  width: 80px;
+}
+
+.pos-col {
+  width: 60px;
+  text-align: center;
+}
+
+.ovr-col {
+  width: 60px;
+  text-align: center;
+}
+
+.stat-col {
+  width: 70px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+}
+
+.stat-col.highlight {
+  background: rgba(232, 255, 71, 0.1);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Rank Badge */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+}
+
+.rank-badge[data-rank="1"] {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  color: #0a0a0f;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+}
+
+.rank-badge[data-rank="2"] {
+  background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
+  color: #0a0a0f;
+}
+
+.rank-badge[data-rank="3"] {
+  background: linear-gradient(135deg, #cd7f32 0%, #e6a87a 100%);
+  color: #0a0a0f;
+}
+
+/* Player Name Cell */
+.player-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.player-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.your-team-badge {
+  padding: 2px 8px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: var(--accent);
+}
+
+/* Team Badge */
+.team-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.5px;
+}
+
+/* Position Badge */
+.pos-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: 0.5px;
+}
+
+/* OVR Value */
+.ovr-value {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* Empty State */
+.empty-state {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.empty-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-subtext {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .leaders-table {
+    font-size: 13px;
+  }
+
+  .stat-col {
+    width: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .category-tabs {
+    flex-direction: column;
+  }
+
+  .category-tab {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .leaders-table th,
+  .leaders-table td {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+}

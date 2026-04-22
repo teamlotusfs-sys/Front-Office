@@ -1,0 +1,470 @@
+﻿/* Schedule Page - NBA 2K Calendar Style */
+
+.schedule-page {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header */
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  gap: 20px;
+}
+
+.schedule-header .page-title {
+  margin: 0 0 8px 0;
+  font-size: 32px;
+}
+
+.schedule-header .page-subtitle {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-secondary);
+}
+
+.record-display {
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+}
+
+.separator {
+  opacity: 0.5;
+}
+
+/* Quick Actions */
+.quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.action-btn.primary {
+  background: var(--accent);
+  color: #0a0a0f;
+  border-color: var(--accent);
+}
+
+.action-btn.primary:hover:not(:disabled) {
+  box-shadow: 0 4px 16px rgba(232, 255, 71, 0.4);
+  transform: translateY(-2px);
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  font-size: 12px;
+}
+
+/* Stats Bar */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+}
+
+/* Month Navigation */
+.month-nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding: 4px;
+}
+
+.month-btn {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 90px;
+}
+
+.month-btn:hover {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+}
+
+.month-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+
+.month-name {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+}
+
+.month-btn.active .month-name {
+  color: var(--accent);
+}
+
+.month-record {
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'DM Mono', monospace;
+  color: var(--text-secondary);
+}
+
+.month-btn.active .month-record {
+  color: var(--accent);
+}
+
+.upcoming-count {
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.empty-month {
+  grid-column: 1 / -1;
+  padding: 80px 20px;
+  text-align: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text-secondary);
+}
+
+.empty-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+/* Game Cards */
+.game-card-wrapper {
+  position: relative;
+}
+
+.game-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.game-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.game-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(232, 255, 71, 0.1);
+}
+
+.game-card.next-game {
+  border-color: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 255, 71, 0.4); }
+  50% { box-shadow: 0 0 0 8px rgba(232, 255, 71, 0); }
+}
+
+.game-card.win {
+  border-left: 5px solid var(--green);
+}
+
+.game-card.loss {
+  border-left: 5px solid var(--red);
+}
+
+/* Game Card Header */
+.game-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.game-date {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-family: 'DM Mono', monospace;
+}
+
+.location-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.location-badge.home {
+  background: rgba(46, 213, 115, 0.15);
+  color: var(--green);
+  border: 1px solid var(--green);
+}
+
+.location-badge.away {
+  background: rgba(255, 107, 107, 0.15);
+  color: var(--orange);
+  border: 1px solid var(--orange);
+}
+
+/* Game Card Body */
+.game-card-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 14px;
+}
+
+.opponent-logo {
+  font-size: 36px;
+  flex-shrink: 0;
+}
+
+.opponent-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.opponent-abbr {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.opponent-name-small {
+  font-size: 11px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Game Card Footer */
+.game-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border);
+  min-height: 56px;
+}
+
+.result-indicator {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.result-indicator.win {
+  background: rgba(46, 213, 115, 0.15);
+  color: var(--green);
+  border: 2px solid var(--green);
+}
+
+.result-indicator.loss {
+  background: rgba(255, 71, 87, 0.15);
+  color: var(--red);
+  border: 2px solid var(--red);
+}
+
+.final-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.final-score .winner {
+  color: var(--text-primary);
+}
+
+.final-score .loser {
+  color: var(--text-muted);
+}
+
+.score-sep {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.view-box {
+  font-size: 10px;
+  color: var(--text-secondary);
+  padding: 4px;
+}
+
+.game-time {
+  flex: 1;
+  text-align: center;
+}
+
+.next-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  animation: glow 1.5s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Expanded Box Score */
+.expanded-boxscore {
+  position: relative;
+  /* Account for sidebar width (220px) and break out from schedule-page max-width */
+  left: 50%;
+  right: 50%;
+  margin-left: calc(-50vw + 110px); /* Half of sidebar width to stay in main area */
+  margin-right: -50vw;
+  width: calc(100vw - 220px); /* Full width minus sidebar */
+  margin-top: 16px;
+  margin-bottom: 16px;
+  padding: 0 20px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.expanded-boxscore .boxscore-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .calendar-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .schedule-header {
+    flex-direction: column;
+  }
+
+  .quick-actions {
+    width: 100%;
+  }
+
+  .action-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

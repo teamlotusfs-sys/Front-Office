@@ -3,7 +3,7 @@ import { useGame, formatSalary } from '../hooks/useGameState';
 import './Rotations.css';
 
 export default function Rotations() {
-  const { gameState, updateRotations } = useGame();
+  const { gameState, updateRotations, autoSetRotations } = useGame();
   const [startingLineup, setStartingLineup] = useState(Array(5).fill(null));
   const [benchRotation, setBenchRotation] = useState(Array(8).fill(null));
   const [minutesAlloc, setMinutesAlloc] = useState({});
@@ -28,6 +28,10 @@ export default function Rotations() {
     updateRotations(startingLineup, benchRotation, minutesAlloc);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const handleAutoSetRotations = () => {
+    autoSetRotations();
   };
 
   const handleSelectPlayer = (index, isStarter) => {
@@ -92,24 +96,43 @@ export default function Rotations() {
       <h1 className="page-title">Rotations & Lineups</h1>
       <p className="page-subtitle">Build your starting lineup and manage bench rotations</p>
 
-      <button
-        onClick={handleSaveRotations}
-        style={{
-          background: saved ? 'var(--green)' : 'var(--accent)',
-          color: '#0a0a0f',
-          border: 'none',
-          padding: '12px 24px',
-          borderRadius: 6,
-          fontWeight: 700,
-          cursor: 'pointer',
-          marginBottom: 24,
-          transition: 'all 0.3s',
-          textTransform: 'uppercase',
-          letterSpacing: '1px',
-        }}
-      >
-        {saved ? '✓ Saved!' : '💾 Save Rotations'}
-      </button>
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+        <button
+          onClick={handleAutoSetRotations}
+          style={{
+            background: 'var(--blue)',
+            color: 'white',
+            border: 'none',
+            padding: '12px 24px',
+            borderRadius: 6,
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+          }}
+        >
+          ⚡ Auto Set Rotations
+        </button>
+
+        <button
+          onClick={handleSaveRotations}
+          style={{
+            background: saved ? 'var(--green)' : 'var(--accent)',
+            color: '#0a0a0f',
+            border: 'none',
+            padding: '12px 24px',
+            borderRadius: 6,
+            fontWeight: 700,
+            cursor: 'pointer',
+            transition: 'all 0.3s',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+          }}
+        >
+          {saved ? '✓ Saved!' : '💾 Save Rotations'}
+        </button>
+      </div>
 
       <div className="rotations-container">
         <div className="rotation-section rotation-roster">
@@ -123,7 +146,10 @@ export default function Rotations() {
                   <div className="roster-player-name">{player.firstName} {player.lastName}</div>
                   <div className="roster-player-stats">
                     <span className="roster-ovr">{player.ovr}</span>
-                    <span className="roster-pos">{player.pos}</span>
+                    <span className="roster-pos">
+                      {player.pos}
+                      {player.secondaryPos && <span style={{ color: 'var(--text-secondary)', fontSize: '10px' }}>/{player.secondaryPos}</span>}
+                    </span>
                   </div>
                 </div>
                 <div className="roster-player-salary">{formatSalary(player.salary)}</div>
@@ -161,6 +187,11 @@ export default function Rotations() {
                   <div className="player-slot filled">
                     <div className="slot-player-name">
                       {startingLineup[idx].firstName} {startingLineup[idx].lastName}
+                      {startingLineup[idx].secondaryPos && (
+                        <span style={{ color: 'var(--text-secondary)', fontSize: '10px', marginLeft: '4px' }}>
+                          ({startingLineup[idx].pos}/{startingLineup[idx].secondaryPos})
+                        </span>
+                      )}
                     </div>
                     <div className="slot-player-stats">
                       <span className="slot-ovr">{startingLineup[idx].ovr}</span>
@@ -209,7 +240,10 @@ export default function Rotations() {
                   <div className="bench-player">
                     <div className="bench-player-info">
                       <div className="bench-player-name">{player.firstName} {player.lastName}</div>
-                      <div className="bench-player-pos">{player.pos}</div>
+                      <div className="bench-player-pos">
+                        {player.pos}
+                        {player.secondaryPos && <span style={{ color: 'var(--text-secondary)', fontSize: '10px' }}>/{player.secondaryPos}</span>}
+                      </div>
                     </div>
                     <div className="bench-player-ovr">{player.ovr}</div>
                     <div className="bench-player-minutes">

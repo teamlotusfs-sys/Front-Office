@@ -13,6 +13,7 @@ import Schedule from './pages/Schedule';
 import Draft from './pages/Draft';
 import Standings from './pages/Standings';
 import Rotations from './pages/Rotations';
+import LeagueLeaders from './pages/LeagueLeaders';
 
 export default function App() {
   return (
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/draft" element={<Draft />} />
             <Route path="/standings" element={<Standings />} />
+            <Route path="/leaders" element={<LeagueLeaders />} />
           </Route>
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

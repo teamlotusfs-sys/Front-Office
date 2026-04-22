@@ -411,11 +411,12 @@
 /* Expanded Box Score */
 .expanded-boxscore {
   position: relative;
+  /* Account for sidebar width (220px) and break out from schedule-page max-width */
   left: 50%;
   right: 50%;
-  margin-left: -50vw;
+  margin-left: calc(-50vw + 110px); /* Half of sidebar width to stay in main area */
   margin-right: -50vw;
-  width: 100vw;
+  width: calc(100vw - 220px); /* Full width minus sidebar */
   margin-top: 16px;
   margin-bottom: 16px;
   padding: 0 20px;
