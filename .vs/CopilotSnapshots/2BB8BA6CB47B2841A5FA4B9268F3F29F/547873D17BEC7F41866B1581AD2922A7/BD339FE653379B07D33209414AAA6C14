@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useGame } from '../hooks/useGameState';
 import GameSimAnimation from '../components/GameSimAnimation';
 import BoxScore from '../components/BoxScore';
@@ -9,8 +9,8 @@ export default function Schedule() {
   const [selectedGame, setSelectedGame] = useState(null);
   const [currentMonth, setCurrentMonth] = useState('Oct');
 
-  // Wrap months in useMemo to prevent reference changes
-  const months = useMemo(() => ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'], []);
+  // Define months outside of useMemo
+  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
 
   // Get schedule early (memoized to prevent dependency issues)
   const schedule = useMemo(() => gameState?.schedule || [], [gameState]);
