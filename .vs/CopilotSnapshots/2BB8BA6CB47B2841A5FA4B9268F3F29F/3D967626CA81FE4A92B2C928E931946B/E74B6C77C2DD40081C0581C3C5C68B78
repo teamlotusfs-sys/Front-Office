@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
@@ -10,6 +10,7 @@ export default function StartGame() {
   const [gmName, setGmName] = useState('');
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [savedGames, setSavedGames] = useState([]);
   const [conferenceFilter, setConferenceFilter] = useState('All');
 
   const styles = {
@@ -108,6 +109,23 @@ export default function StartGame() {
       minWidth: '300px'
     }
   };
+
+  // Load saved games from localStorage on mount
+  useEffect(() => {
+    const saves = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key.startsWith('frontoffice_save_')) {
+        try {
+          const saveData = JSON.parse(localStorage.getItem(key));
+          saves.push({ key, ...saveData });
+        } catch (e) {
+          console.error('Failed to load save:', e);
+        }
+      }
+    }
+    setSavedGames(saves.sort((a, b) => b.lastPlayed - a.lastPlayed));
+  }, []);
 
   // Check if there's an active game and redirect
   useEffect(() => {
