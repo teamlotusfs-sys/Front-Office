@@ -1,4 +1,4 @@
-function random() {
+﻿function random() {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     const arr = new Uint32Array(1);
     crypto.getRandomValues(arr);
@@ -35,7 +35,6 @@ export function getMinutesPlayed(isStarter, requestedMinutes) {
 // Generate realistic basketball stats that sum to team total
 export function generateTeamBoxScore(players, teamScore, isWinner) {
   const boxScore = [];
-  let pointsRemaining = teamScore;
 
   // Sort by OVR to determine usage
   const sortedPlayers = [...players].sort((a, b) => b.ovr - a.ovr);
@@ -51,7 +50,7 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
     return usage;
   });
 
-  // Generate stats for each player
+  // Normalize usage to distribute team points
   sortedPlayers.forEach((player, index) => {
     const isStarter = index < 5;
     const minutes = getMinutesPlayed(isStarter, player.requestedMinutes);
@@ -80,22 +79,15 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
     }
 
     // Distribute points based on usage
-    let points;
-    if (index === sortedPlayers.length - 1) {
-      // Last player gets remaining points to ensure exact total
-      points = Math.max(0, pointsRemaining);
-    } else {
-      const usagePercent = usageShares[index] / totalUsage;
-      const rawPoints = teamScore * usagePercent;
-      const variance = (random() - 0.5) * 3; // Reduced variance
-      points = Math.max(0, Math.round(rawPoints + variance));
-      pointsRemaining -= points;
-    }
+    const usagePercent = usageShares[index] / totalUsage;
+    const rawPoints = teamScore * usagePercent;
+    const variance = (random() - 0.5) * 4; // Add randomness
+    const points = Math.max(0, Math.round(rawPoints + variance));
 
     // Calculate shooting stats based on points and player OVR
-    const fgPercent = 0.38 + (player.ovr / 100) * 0.22; // 38-60% based on OVR
-    const tpPercent = 0.28 + (player.ovr / 100) * 0.17; // 28-45% 3PT
-    const ftPercent = 0.65 + (player.ovr / 100) * 0.25; // 65-90% FT
+    const fgPercent = 0.35 + (player.ovr / 100) * 0.25; // 35-60% based on OVR
+    const tpPercent = 0.25 + (player.ovr / 100) * 0.20; // 25-45% 3PT
+    const ftPercent = 0.60 + (player.ovr / 100) * 0.30; // 60-90% FT
 
     // Estimate shot distribution
     const threePointRate = player.pos === 'C' ? 0.15 : player.pos === 'PF' ? 0.25 : 0.35;
@@ -103,17 +95,17 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
 
     const pointsFrom3 = Math.round(points * threePointRate);
     const pointsFromFT = Math.round(points * freeThrowRate);
-    const pointsFrom2 = Math.max(0, points - pointsFrom3 - pointsFromFT);
+    const pointsFrom2 = points - pointsFrom3 - pointsFromFT;
 
     const tpm = Math.floor(pointsFrom3 / 3);
-    const tpa = Math.max(tpm, Math.round(tpm / Math.max(0.25, tpPercent)));
+    const tpa = Math.max(tpm, Math.round(tpm / tpPercent));
 
     const ftm = pointsFromFT;
-    const fta = Math.max(ftm, Math.round(ftm / Math.max(0.5, ftPercent)));
+    const fta = Math.max(ftm, Math.round(ftm / ftPercent));
 
     const fgmFrom2 = Math.floor(pointsFrom2 / 2);
     const fgm = fgmFrom2 + tpm;
-    const fga = Math.max(fgm, Math.round(fgm / Math.max(0.3, fgPercent)));
+    const fga = Math.max(fgm, Math.round(fgm / fgPercent));
 
     // Other stats based on position and minutes
     const rebounds = Math.max(0, Math.round(
