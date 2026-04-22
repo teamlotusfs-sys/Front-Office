@@ -1,4 +1,4 @@
-function random() {
+﻿function random() {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     const arr = new Uint32Array(1);
     crypto.getRandomValues(arr);
@@ -37,43 +37,41 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
   const boxScore = [];
   let pointsRemaining = teamScore;
 
-  // Sort by OVR to determine rotation (top 10 players play in real NBA)
+  // Sort by OVR to determine usage
   const sortedPlayers = [...players].sort((a, b) => b.ovr - a.ovr);
-  const rotation = sortedPlayers.slice(0, 10); // Only top 10 play
-  const dnp = sortedPlayers.slice(10); // Rest get DNP
 
   // NBA-realistic usage rates based on OVR - MORE AGGRESSIVE
-  const usageShares = rotation.map((player, index) => {
+  const usageShares = sortedPlayers.map((player, index) => {
     const isStarter = index < 5;
 
     if (!isStarter) {
-      // Bench players (6-10): low usage
-      return 0.10 + (player.ovr / 100) * 0.08; // 0.10-0.18
+      // Bench players: very low usage
+      return 0.08 + (player.ovr / 100) * 0.10; // 0.08-0.18
     }
 
-    // Starters (1-5): MUCH more aggressive usage for stars
+    // Starters: MUCH more aggressive usage for stars
     if (player.ovr >= 90) {
-      // Superstar: 32-45% usage (can take over games)
-      return 0.32 + (player.ovr - 90) * 0.013 + random() * 0.13;
+      // Superstar: 30-40% usage (can take over games)
+      return 0.30 + (player.ovr - 90) * 0.01 + random() * 0.10;
     } else if (player.ovr >= 85) {
-      // Star: 26-35% usage
-      return 0.26 + (player.ovr - 85) * 0.018 + random() * 0.09;
+      // Star: 24-32% usage
+      return 0.24 + (player.ovr - 85) * 0.016 + random() * 0.08;
     } else if (player.ovr >= 80) {
-      // Good starter: 20-28% usage
-      return 0.20 + (player.ovr - 80) * 0.016 + random() * 0.08;
+      // Good starter: 18-25% usage
+      return 0.18 + (player.ovr - 80) * 0.014 + random() * 0.07;
     } else if (player.ovr >= 75) {
-      // Decent starter: 16-22% usage
-      return 0.16 + (player.ovr - 75) * 0.012 + random() * 0.06;
+      // Decent starter: 14-20% usage
+      return 0.14 + (player.ovr - 75) * 0.012 + random() * 0.06;
     } else {
-      // Weak starter: 12-18% usage
-      return 0.12 + (player.ovr - 65) * 0.006 + random() * 0.06;
+      // Weak starter: 10-15% usage
+      return 0.10 + (player.ovr - 65) * 0.005 + random() * 0.05;
     }
   });
 
   const totalUsage = usageShares.reduce((sum, u) => sum + u, 0);
 
-  // Generate stats for rotation players
-  rotation.forEach((player, index) => {
+  // Generate stats for each player
+  sortedPlayers.forEach((player, index) => {
     const isStarter = index < 5;
     const minutes = getMinutesPlayed(isStarter, player.requestedMinutes);
 
@@ -104,8 +102,8 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
     let points;
     const normalizedUsage = usageShares[index] / totalUsage;
 
-    if (index === rotation.length - 1) {
-      // Last rotation player gets remaining points
+    if (index === sortedPlayers.length - 1 || minutes === 0) {
+      // Last active player gets remaining points
       points = Math.max(0, pointsRemaining);
     } else {
       const basePoints = teamScore * normalizedUsage;
@@ -116,23 +114,23 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
 
       if (player.ovr >= 88) {
         if (hotColdRoll > 0.85) {
-          // Superstar explosion (15% chance) - 50-80% boost!
-          varianceMultiplier = 1.5 + random() * 0.3;
+          // Superstar explosion (15% chance) - 40-70% boost!
+          varianceMultiplier = 1.4 + random() * 0.3;
         } else if (hotColdRoll < 0.12) {
           // Superstar cold night (12% chance)
-          varianceMultiplier = 0.50 + random() * 0.25;
+          varianceMultiplier = 0.55 + random() * 0.20;
         }
       } else if (player.ovr >= 82) {
         if (hotColdRoll > 0.80) {
-          // Star great game (20% chance) - 30-55% boost
-          varianceMultiplier = 1.30 + random() * 0.25;
+          // Star great game (20% chance) - 25-50% boost
+          varianceMultiplier = 1.25 + random() * 0.25;
         } else if (hotColdRoll < 0.15) {
           // Star cold night
-          varianceMultiplier = 0.55 + random() * 0.25;
+          varianceMultiplier = 0.60 + random() * 0.20;
         }
       } else if (hotColdRoll < 0.15) {
         // Regular players just have cold nights occasionally
-        varianceMultiplier = 0.60 + random() * 0.25;
+        varianceMultiplier = 0.65 + random() * 0.20;
       }
 
       points = Math.max(0, Math.round(basePoints * varianceMultiplier));
@@ -216,28 +214,6 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
       blocks,
       turnovers,
       fouls,
-    });
-  });
-
-  // Add DNP entries for players outside rotation
-  dnp.forEach(player => {
-    boxScore.push({
-      playerId: player.id,
-      playerName: `${player.firstName} ${player.lastName}`,
-      minutes: 0,
-      points: 0,
-      fgm: 0,
-      fga: 0,
-      tpm: 0,
-      tpa: 0,
-      ftm: 0,
-      fta: 0,
-      rebounds: 0,
-      assists: 0,
-      steals: 0,
-      blocks: 0,
-      turnovers: 0,
-      fouls: 0,
     });
   });
 

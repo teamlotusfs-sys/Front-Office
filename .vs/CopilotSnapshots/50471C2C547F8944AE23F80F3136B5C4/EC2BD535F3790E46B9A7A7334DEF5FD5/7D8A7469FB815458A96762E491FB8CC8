@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -446,8 +446,8 @@ const simulateGame = useCallback(() => {
     
     const newSchedule = newAllSchedules[prev.team.id];
 
-    // Simulate OTHER teams' games on SAME DATE ONLY
-    const gameDate = nextGame.date;
+    // Simulate ALL OTHER games up to current date
+    const currentGameDate = parseDate(nextGame.date);
     NBA_TEAMS.forEach(otherTeam => {
       if (otherTeam.id === prev.team.id) return;
 
@@ -456,10 +456,10 @@ const simulateGame = useCallback(() => {
       }
 
       const teamSchedule = newAllSchedules[otherTeam.id];
-      // Only simulate games on the SAME DATE as user's game
-      const gamesOnSameDay = teamSchedule.filter(g => !g.played && g.date === gameDate);
+      // Simulate ALL unplayed games up to current date
+      const gamesUpToNow = teamSchedule.filter(g => !g.played && parseDate(g.date) <= currentGameDate);
 
-      gamesOnSameDay.forEach(game => {
+      gamesUpToNow.forEach(game => {
         const oppTeam = NBA_TEAMS.find(t => t.abbr === game.opponent);
         if (!oppTeam) return;
 
