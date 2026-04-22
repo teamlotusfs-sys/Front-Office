@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
 import './Standings.css';
@@ -11,7 +11,7 @@ export default function Standings() {
   const standings = useMemo(() => {
     if (!gameState || !gameState.teamSchedules) return [];
 
-    const { teamSchedules } = gameState;
+    const { team, teamSchedules } = gameState;
 
     // Calculate records from teamSchedules
     const teamRecords = {};

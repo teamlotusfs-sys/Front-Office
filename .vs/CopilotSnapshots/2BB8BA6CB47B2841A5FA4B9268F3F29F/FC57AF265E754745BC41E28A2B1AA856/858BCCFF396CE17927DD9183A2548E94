@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+﻿import React, { useState, useMemo } from 'react';
 import { useGame } from '../hooks/useGameState';
 import GameSimAnimation from '../components/GameSimAnimation';
 import BoxScore from '../components/BoxScore';
@@ -9,11 +9,8 @@ export default function Schedule() {
   const [selectedGame, setSelectedGame] = useState(null);
   const [currentMonth, setCurrentMonth] = useState('Oct');
 
-  // Define months outside of useMemo
-  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-
-  // Get schedule early (memoized to prevent dependency issues)
-  const schedule = useMemo(() => gameState?.schedule || [], [gameState]);
+  // Get schedule early (before hooks)
+  const schedule = gameState?.schedule || [];
 
   // Memoize stats calculation
   const stats = useMemo(() => ({
@@ -37,12 +34,13 @@ export default function Schedule() {
   };
 
   // Group games by month
+  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
   const gamesByMonth = useMemo(() => 
     months.reduce((acc, month) => {
       acc[month] = schedule.filter(g => g.date && g.date.startsWith(month));
       return acc;
     }, {}),
-    [schedule, months]
+    [schedule]
   );
 
   const currentMonthGames = gamesByMonth[currentMonth] || [];
