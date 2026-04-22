@@ -1,4 +1,4 @@
-function random() {
+﻿function random() {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     const arr = new Uint32Array(1);
     crypto.getRandomValues(arr);

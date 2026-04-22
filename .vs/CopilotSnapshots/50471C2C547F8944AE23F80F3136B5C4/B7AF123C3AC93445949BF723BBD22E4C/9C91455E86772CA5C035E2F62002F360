@@ -1,4 +1,4 @@
-function random() {
+﻿function random() {
   if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
     const arr = new Uint32Array(1);
     crypto.getRandomValues(arr);
@@ -40,31 +40,28 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
   // Sort by OVR to determine usage
   const sortedPlayers = [...players].sort((a, b) => b.ovr - a.ovr);
 
-  // NBA-realistic usage rates based on OVR - MORE AGGRESSIVE
+  // NBA-realistic usage rates based on OVR
   const usageShares = sortedPlayers.map((player, index) => {
     const isStarter = index < 5;
 
     if (!isStarter) {
-      // Bench players: very low usage
-      return 0.08 + (player.ovr / 100) * 0.10; // 0.08-0.18
+      // Bench players: low usage
+      return 0.15 + (player.ovr / 100) * 0.15; // 0.15-0.30
     }
 
-    // Starters: MUCH more aggressive usage for stars
-    if (player.ovr >= 90) {
-      // Superstar: 30-40% usage (can take over games)
-      return 0.30 + (player.ovr - 90) * 0.01 + random() * 0.10;
-    } else if (player.ovr >= 85) {
-      // Star: 24-32% usage
-      return 0.24 + (player.ovr - 85) * 0.016 + random() * 0.08;
-    } else if (player.ovr >= 80) {
-      // Good starter: 18-25% usage
-      return 0.18 + (player.ovr - 80) * 0.014 + random() * 0.07;
+    // Starters: usage heavily weighted by OVR
+    if (player.ovr >= 88) {
+      // Superstar: 28-35% usage
+      return 0.28 + (player.ovr - 88) * 0.007 + random() * 0.05;
+    } else if (player.ovr >= 82) {
+      // Star: 22-28% usage
+      return 0.22 + (player.ovr - 82) * 0.01 + random() * 0.04;
     } else if (player.ovr >= 75) {
-      // Decent starter: 14-20% usage
-      return 0.14 + (player.ovr - 75) * 0.012 + random() * 0.06;
+      // Good starter: 16-22% usage
+      return 0.16 + (player.ovr - 75) * 0.008 + random() * 0.03;
     } else {
-      // Weak starter: 10-15% usage
-      return 0.10 + (player.ovr - 65) * 0.005 + random() * 0.05;
+      // Role player: 10-16% usage
+      return 0.10 + (player.ovr - 65) * 0.006 + random() * 0.02;
     }
   });
 
@@ -108,29 +105,19 @@ export function generateTeamBoxScore(players, teamScore, isWinner) {
     } else {
       const basePoints = teamScore * normalizedUsage;
 
-      // Add hot/cold variance - superstars can REALLY go OFF
+      // Add hot/cold variance - superstars can go OFF
       let varianceMultiplier = 1.0;
       const hotColdRoll = random();
 
-      if (player.ovr >= 88) {
-        if (hotColdRoll > 0.85) {
-          // Superstar explosion (15% chance) - 40-70% boost!
-          varianceMultiplier = 1.4 + random() * 0.3;
-        } else if (hotColdRoll < 0.12) {
-          // Superstar cold night (12% chance)
-          varianceMultiplier = 0.55 + random() * 0.20;
-        }
-      } else if (player.ovr >= 82) {
-        if (hotColdRoll > 0.80) {
-          // Star great game (20% chance) - 25-50% boost
-          varianceMultiplier = 1.25 + random() * 0.25;
-        } else if (hotColdRoll < 0.15) {
-          // Star cold night
-          varianceMultiplier = 0.60 + random() * 0.20;
-        }
+      if (player.ovr >= 85 && hotColdRoll > 0.85) {
+        // Superstar going OFF (15% chance)
+        varianceMultiplier = 1.3 + random() * 0.3; // 30-60% boost
+      } else if (player.ovr >= 80 && hotColdRoll > 0.75) {
+        // Star having a great game (25% chance)
+        varianceMultiplier = 1.15 + random() * 0.25; // 15-40% boost
       } else if (hotColdRoll < 0.15) {
-        // Regular players just have cold nights occasionally
-        varianceMultiplier = 0.65 + random() * 0.20;
+        // Cold night
+        varianceMultiplier = 0.6 + random() * 0.2; // 60-80% output
       }
 
       points = Math.max(0, Math.round(basePoints * varianceMultiplier));

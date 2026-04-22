@@ -90,8 +90,7 @@
               "RelativeToolTip": "src\\components\\GameLayout.jsx",
               "ViewState": "AgIAAAwAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
-              "WhenOpened": "2026-04-22T17:09:59.279Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T17:09:59.279Z"
             },
             {
               "$type": "Document",
@@ -103,8 +102,7 @@
               "RelativeToolTip": "src\\App.js",
               "ViewState": "AgIAAA0AAAAAAAAAAABRwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T17:09:33.515Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T17:09:33.515Z"
             },
             {
               "$type": "Document",
@@ -116,8 +114,7 @@
               "RelativeToolTip": "src\\pages\\LeagueLeaders.css",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACkBAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-22T17:09:04.803Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T17:09:04.803Z"
             },
             {
               "$type": "Document",
@@ -142,8 +139,7 @@
               "RelativeToolTip": "src\\pages\\Rotations.jsx",
               "ViewState": "AgIAAPQAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
-              "WhenOpened": "2026-04-22T16:50:41.891Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T16:50:41.891Z"
             },
             {
               "$type": "Document",
@@ -155,8 +151,7 @@
               "RelativeToolTip": "src\\data\\nbaData.js",
               "ViewState": "AgIAAEYAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T16:49:49.252Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T16:49:49.252Z"
             },
             {
               "$type": "Document",
@@ -191,8 +186,7 @@
               "RelativeToolTip": "src\\hooks\\useGameState.js",
               "ViewState": "AgIAAEsAAAAAAAAAAIBJwE4BAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T15:58:44.037Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:58:44.037Z"
             },
             {
               "$type": "Document",
@@ -204,7 +198,8 @@
               "RelativeToolTip": "src\\data\\playerStatsHelpers.js",
               "ViewState": "AgIAACkAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T15:58:43.993Z"
+              "WhenOpened": "2026-04-22T15:58:43.993Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -216,8 +211,7 @@
               "RelativeToolTip": "src\\pages\\Schedule.css",
               "ViewState": "AgIAAJ0BAAAAAAAAAABBwAAAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-22T15:58:08.433Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:58:08.433Z"
             },
             {
               "$type": "Document",
@@ -241,8 +235,7 @@
               "RelativeToolTip": "src\\components\\BoxScore.css",
               "ViewState": "AgIAAIkAAAAAAAAAAAAAAMkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-22T15:57:24.727Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:57:24.727Z"
             },
             {
               "$type": "Document",
