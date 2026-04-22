@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generatePlayerGameStats, generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -245,6 +245,7 @@ const simulateGame = useCallback(() => {
     }));
     const yourBoxScore = generateTeamBoxScore(yourPlayersWithMinutes, finalYourScore, won);
 
+    const oppRoster = prev.allRosters[opponent.id] || [];
     const oppBoxScore = generateTeamBoxScore(oppRoster, finalOppScore, !won);
 
     // Update player season stats
