@@ -66,8 +66,7 @@
               "RelativeToolTip": "src\\pages\\Dashboard.jsx",
               "ViewState": "AgIAAGgAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
-              "WhenOpened": "2026-04-22T16:19:02.419Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T16:19:02.419Z"
             },
             {
               "$type": "Document",
@@ -102,8 +101,7 @@
               "RelativeToolTip": "src\\components\\BoxScore.jsx",
               "ViewState": "AgIAAA0AAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
-              "WhenOpened": "2026-04-22T15:58:44.079Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:58:44.079Z"
             },
             {
               "$type": "Document",
@@ -126,9 +124,10 @@
               "RelativeDocumentMoniker": "src\\data\\playerStatsHelpers.js",
               "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\data\\playerStatsHelpers.js",
               "RelativeToolTip": "src\\data\\playerStatsHelpers.js",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAACQAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T15:58:43.993Z"
+              "WhenOpened": "2026-04-22T15:58:43.993Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -162,9 +161,10 @@
               "RelativeDocumentMoniker": "src\\components\\BoxScore.css",
               "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\components\\BoxScore.css",
               "RelativeToolTip": "src\\components\\BoxScore.css",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAL4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAcAAAAAAAAAAABBwNwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2026-04-22T15:57:24.727Z"
+              "WhenOpened": "2026-04-22T15:57:24.727Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
