@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
-import { generatePlayerGameStats, generateTeamBoxScore } from '../data/playerStatsHelpers';
+import { generatePlayerGameStats } from '../data/playerStatsHelpers';
 
 const GameContext = createContext(null);
 const TOTAL_SALARY_CAP = 150_000_000;
@@ -199,39 +199,26 @@ const simulateGame = useCallback(() => {
     
     const rotations = prev.rotations;
     const activePlayers = [...rotations.starters, ...rotations.bench].filter(p => p !== null);
-
+    
     if (activePlayers.length < 5) {
       const newNotif = { id: Date.now(), type: 'warning', text: 'Need 5+ players in rotation!', read: false };
       setGameAnimation(null);
       return { ...prev, notifications: [newNotif, ...prev.notifications] };
     }
 
-    // Helper function to calculate team rating from roster
-    const calculateTeamRating = (roster) => {
-      if (!roster || roster.length === 0) return 70; // Default rating
-      // Use top 8 players (starters + key bench) for team rating
-      const topPlayers = [...roster].sort((a, b) => b.ovr - a.ovr).slice(0, 8);
-      return topPlayers.reduce((sum, p) => sum + p.ovr, 0) / topPlayers.length;
-    };
-
     // Simulate YOUR game
     const avgActiveOvr = activePlayers.reduce((sum, p) => sum + p.ovr, 0) / activePlayers.length;
-    const homeBonus = nextGame.isHome ? 3 : -3;
+    const homeBonus = nextGame.isHome ? 2 : -2;
     const adjustedRating = avgActiveOvr + homeBonus;
-
-    // Calculate opponent rating from their actual roster
-    const oppRoster = prev.allRosters[opponent.id] || [];
-    const oppTeamRating = calculateTeamRating(oppRoster);
-    const adjustedOppRating = oppTeamRating - homeBonus;
-
-    // Use logistic function for realistic win probability
-    const ratingDiff = adjustedRating - adjustedOppRating;
-    const winProbability = 1 / (1 + Math.pow(10, -ratingDiff / 15));
+    const adjustedOppRating = opponent.rating - homeBonus;
+    
+    const totalRating = adjustedRating + adjustedOppRating;
+    const winProbability = adjustedRating / totalRating;
     const won = random() < winProbability;
-
+    
     const baseScore = 100 + ((avgActiveOvr - 70) * 0.8);
     const yourScore = Math.round(baseScore + (random() - 0.5) * 20);
-    const oppBaseScore = 100 + ((oppTeamRating - 70) * 0.8);
+    const oppBaseScore = 100 + ((opponent.rating - 70) * 0.8);
     const oppScore = Math.round(oppBaseScore + (random() - 0.5) * 20);
     
     const finalYourScore = won ? Math.max(oppScore + 1, yourScore) : Math.min(oppScore - 1, yourScore);
@@ -292,27 +279,16 @@ const simulateGame = useCallback(() => {
       newPlayerStats[player.id].totalBlocks += gameStats.blocks;
       newPlayerStats[player.id].gameLog.push(gameStats);
     });
-
+    
     const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
     const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
-
+    
     // Update ALL schedules
     const newAllSchedules = { ...prev.allSchedules };
-
-    // Update YOUR game with box score
+    
+    // Update YOUR game
     newAllSchedules[prev.team.id] = prev.schedule.map(g => 
-      g.id === nextGame.id ? { 
-        ...g, 
-        played: true, 
-        won, 
-        score,
-        boxScore: {
-          home: nextGame.isHome ? yourBoxScore : oppBoxScore,
-          away: nextGame.isHome ? oppBoxScore : yourBoxScore,
-          homeTeam: nextGame.isHome ? prev.team.abbr : opponent.abbr,
-          awayTeam: nextGame.isHome ? opponent.abbr : prev.team.abbr,
-        }
-      } : g
+      g.id === nextGame.id ? { ...g, played: true, won, score } : g
     );
     
     const newSchedule = newAllSchedules[prev.team.id];
@@ -332,22 +308,17 @@ const simulateGame = useCallback(() => {
       gamesOnSameDay.forEach(game => {
         const oppTeam = NBA_TEAMS.find(t => t.abbr === game.opponent);
         if (!oppTeam) return;
-
-        // Calculate ratings from actual rosters
-        const teamRoster = prev.allRosters[otherTeam.id] || [];
-        const teamRating = calculateTeamRating(teamRoster);
-        const oppRoster = prev.allRosters[oppTeam.id] || [];
-        const oppTeamRating = calculateTeamRating(oppRoster);
-
-        const teamHomeBonus = game.isHome ? 3 : -3;
+        
+        const teamRating = otherTeam.rating;
+        const oppTeamRating = oppTeam.rating;
+        const teamHomeBonus = game.isHome ? 2 : -2;
         const adjustedTeamRating = teamRating + teamHomeBonus;
         const adjustedOppTeamRating = oppTeamRating - teamHomeBonus;
-
-        // Use logistic function for realistic win probability
-        const teamRatingDiff = adjustedTeamRating - adjustedOppTeamRating;
-        const teamWinProb = 1 / (1 + Math.pow(10, -teamRatingDiff / 15));
+        
+        const totalTeamRating = adjustedTeamRating + adjustedOppTeamRating;
+        const teamWinProb = adjustedTeamRating / totalTeamRating;
         const teamWon = random() < teamWinProb;
-
+        
         const teamBaseScore = 100 + ((teamRating - 70) * 0.8);
         const teamScore = Math.round(teamBaseScore + (random() - 0.5) * 20);
         const oppBaseScore = 100 + ((oppTeamRating - 70) * 0.8);

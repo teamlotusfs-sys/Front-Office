@@ -1,23 +1,19 @@
 import React, { useState } from 'react';
 import { useGame } from '../hooks/useGameState';
 import GameSimAnimation from '../components/GameSimAnimation';
+import BoxScore from '../components/BoxScore';
 import './Schedule.css';
 
 export default function Schedule() {
   const { gameState, gameAnimation, simulateGame } = useGame();
-  const [filter, setFilter] = useState('all');
+  const [selectedGame, setSelectedGame] = useState(null);
+  const [currentMonth, setCurrentMonth] = useState('Oct');
 
   if (!gameState) {
     return <div className="page-title">Loading...</div>;
   }
-  
-  const { schedule } = gameState;
 
-  const filtered = schedule.filter(g => {
-    if (filter === 'played') return g.played;
-    if (filter === 'unplayed') return !g.played;
-    return true;
-  });
+  const { schedule } = gameState;
 
   const stats = {
     total: schedule.length,
@@ -33,110 +29,183 @@ export default function Schedule() {
     }
   };
 
-  return (
-    <div>
-      <h1 className="page-title">Schedule</h1>
-      <p className="page-subtitle">2025-26 Season</p>
+  const handleGameClick = (game) => {
+    if (game.played && game.boxScore) {
+      setSelectedGame(selectedGame?.id === game.id ? null : game);
+    }
+  };
 
-      <div className="schedule-stats">
-        <div className="stat-box">
-          <div className="stat-label">Record</div>
-          <div className="stat-value">{stats.wins}-{stats.losses}</div>
+  // Group games by month
+  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+  const gamesByMonth = months.reduce((acc, month) => {
+    acc[month] = schedule.filter(g => g.date.startsWith(month));
+    return acc;
+  }, {});
+
+  const currentMonthGames = gamesByMonth[currentMonth] || [];
+
+  // Get next unplayed game for quick sim
+  const nextGame = schedule.find(g => !g.played);
+
+  return (
+    <div className="schedule-page">
+      <div className="schedule-header">
+        <div>
+          <h1 className="page-title">2025-26 Schedule</h1>
+          <p className="page-subtitle">
+            <span className="record-display">{stats.wins}W - {stats.losses}L</span>
+            <span className="separator">•</span>
+            <span>{stats.played}/{stats.total} Games Played</span>
+          </p>
         </div>
-        <div className="stat-box">
-          <div className="stat-label">Played</div>
-          <div className="stat-value">{stats.played}/{stats.total}</div>
+        <div className="quick-actions">
+          <button onClick={simulateGame} className="action-btn primary" disabled={!nextGame}>
+            <span className="btn-icon">▶</span>
+            Sim Next
+          </button>
+          <button onClick={() => handleSimMultiple(10)} className="action-btn" disabled={stats.remaining < 10}>
+            <span className="btn-icon">⏩</span>
+            Sim 10
+          </button>
+          <button onClick={() => handleSimMultiple(stats.remaining)} className="action-btn" disabled={stats.remaining === 0}>
+            <span className="btn-icon">⏭️</span>
+            Finish Season
+          </button>
         </div>
-        <div className="stat-box">
-          <div className="stat-label">Remaining</div>
-          <div className="stat-value">{stats.remaining}</div>
-        </div>
-        <div className="stat-box">
+      </div>
+
+      {/* Stats Bar */}
+      <div className="stats-bar">
+        <div className="stat-item">
           <div className="stat-label">Win %</div>
           <div className="stat-value">
             {stats.played > 0 ? ((stats.wins / stats.played) * 100).toFixed(1) : '0.0'}%
           </div>
         </div>
+        <div className="stat-item">
+          <div className="stat-label">Home</div>
+          <div className="stat-value">
+            {schedule.filter(g => g.played && g.isHome && g.won).length}-
+            {schedule.filter(g => g.played && g.isHome && !g.won).length}
+          </div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-label">Away</div>
+          <div className="stat-value">
+            {schedule.filter(g => g.played && !g.isHome && g.won).length}-
+            {schedule.filter(g => g.played && !g.isHome && !g.won).length}
+          </div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-label">Remaining</div>
+          <div className="stat-value">{stats.remaining}</div>
+        </div>
       </div>
 
-      <div className="schedule-controls">
-        <button onClick={simulateGame} className="sim-btn sim-btn-primary">
-          ▶ Sim Next Game
-        </button>
-        <button onClick={() => handleSimMultiple(5)} className="sim-btn">
-          ⏩ Sim 5 Games
-        </button>
-        <button onClick={() => handleSimMultiple(10)} className="sim-btn">
-          ⏩⏩ Sim 10 Games
-        </button>
-        <button
-          onClick={() => handleSimMultiple(stats.remaining)}
-          className="sim-btn"
-          disabled={stats.remaining === 0}
-        >
-          ⏭️ Sim Rest of Season
-        </button>
-      </div>
-
-      <div className="schedule-filters">
-        {['all', 'played', 'unplayed'].map(f => (
-          <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={`filter-btn ${filter === f ? 'active' : ''}`}
-          >
-            {f === 'all' ? 'All Games' : f === 'played' ? 'Played' : 'Upcoming'}
-            <span className="filter-count">
-              {f === 'all' ? stats.total : f === 'played' ? stats.played : stats.remaining}
-            </span>
-          </button>
-        ))}
+      {/* Month Navigation */}
+      <div className="month-nav">
+        {months.map(month => {
+          const monthGames = gamesByMonth[month] || [];
+          const monthRecord = {
+            w: monthGames.filter(g => g.played && g.won).length,
+            l: monthGames.filter(g => g.played && !g.won).length,
+          };
+          return (
+            <button
+              key={month}
+              onClick={() => setCurrentMonth(month)}
+              className={`month-btn ${currentMonth === month ? 'active' : ''}`}
+            >
+              <div className="month-name">{month}</div>
+              {monthGames.length > 0 && (
+                <div className="month-record">
+                  {monthRecord.w > 0 || monthRecord.l > 0 ? (
+                    <span>{monthRecord.w}-{monthRecord.l}</span>
+                  ) : (
+                    <span className="upcoming-count">{monthGames.length}G</span>
+                  )}
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       {gameAnimation && <GameSimAnimation {...gameAnimation} />}
 
-      <div className="schedule-list">
-        {filtered.length === 0 ? (
-          <div className="empty-state"><p>No games found</p></div>
+      {/* Calendar Grid */}
+      <div className="calendar-grid">
+        {currentMonthGames.length === 0 ? (
+          <div className="empty-month">
+            <div className="empty-icon">📅</div>
+            <p>No games scheduled in {currentMonth}</p>
+          </div>
         ) : (
-          filtered.map((game, idx) => (
-            <div
-              key={game.id}
-              className={`schedule-game ${game.played ? 'played' : 'upcoming'} ${
-                game.played && game.won ? 'win' : ''
-              } ${game.played && !game.won ? 'loss' : ''}`}
-            >
-              <div className="game-number">Game {idx + 1}</div>
-              <div className="game-matchup">
-                <div className="team-indicator">{game.isHome ? '🏠' : '✈️'}</div>
-                <div className="opponent-info">
-                  <div className="opponent-name">{game.oppName}</div>
-                  <div className="opponent-meta">
-                    <span className="opponent-abbr">{game.opponent}</span>
-                    <span className="game-date">{game.date}</span>
+          currentMonthGames.map((game, idx) => (
+            <div key={game.id} className="game-card-wrapper">
+              <div
+                className={`game-card ${game.played ? 'played' : 'upcoming'} ${
+                  game.played && game.won ? 'win' : game.played && !game.won ? 'loss' : ''
+                } ${selectedGame?.id === game.id ? 'selected' : ''} ${
+                  !game.played && nextGame?.id === game.id ? 'next-game' : ''
+                }`}
+                onClick={() => handleGameClick(game)}
+              >
+                {/* Game Header */}
+                <div className="game-card-header">
+                  <div className="game-date">{game.date}</div>
+                  <div className="game-location">
+                    {game.isHome ? (
+                      <span className="location-badge home">HOME</span>
+                    ) : (
+                      <span className="location-badge away">AWAY</span>
+                    )}
                   </div>
                 </div>
-              </div>
-              <div className="game-status">
-                {game.played ? (
-                  <>
-                    <div className={`result-badge ${game.won ? 'win' : 'loss'}`}>
-                      {game.won ? 'W' : 'L'}
+
+                {/* Team Info */}
+                <div className="game-card-body">
+                  <div className="opponent-logo">{game.isHome ? '🏠' : '✈️'}</div>
+                  <div className="opponent-details">
+                    <div className="opponent-abbr">{game.opponent}</div>
+                    <div className="opponent-name-small">{game.oppName}</div>
+                  </div>
+                </div>
+
+                {/* Game Result */}
+                <div className="game-card-footer">
+                  {game.played ? (
+                    <>
+                      <div className={`result-indicator ${game.won ? 'win' : 'loss'}`}>
+                        {game.won ? 'W' : 'L'}
+                      </div>
+                      <div className="final-score">
+                        <span className={game.won ? 'winner' : 'loser'}>{game.score.us}</span>
+                        <span className="score-sep">-</span>
+                        <span className={!game.won ? 'winner' : 'loser'}>{game.score.them}</span>
+                      </div>
+                      {game.boxScore && (
+                        <div className="view-box">
+                          {selectedGame?.id === game.id ? '▼' : '▶'}
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="game-time">
+                      {!game.played && nextGame?.id === game.id && (
+                        <span className="next-badge">NEXT GAME</span>
+                      )}
                     </div>
-                    <div className="score">
-                      <span className={game.won ? 'winning-score' : 'losing-score'}>
-                        {game.score.us}
-                      </span>
-                      <span className="score-dash">-</span>
-                      <span className={!game.won ? 'winning-score' : 'losing-score'}>
-                        {game.score.them}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <div className="upcoming-badge">Upcoming</div>
-                )}
+                  )}
+                </div>
               </div>
+
+              {/* Expanded Box Score */}
+              {selectedGame?.id === game.id && (
+                <div className="expanded-boxscore">
+                  <BoxScore game={game} />
+                </div>
+              )}
             </div>
           ))
         )}

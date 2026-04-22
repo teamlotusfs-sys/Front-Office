@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
-import { generatePlayerGameStats, generateTeamBoxScore } from '../data/playerStatsHelpers';
+import { generatePlayerGameStats } from '../data/playerStatsHelpers';
 
 const GameContext = createContext(null);
 const TOTAL_SALARY_CAP = 150_000_000;
@@ -292,27 +292,16 @@ const simulateGame = useCallback(() => {
       newPlayerStats[player.id].totalBlocks += gameStats.blocks;
       newPlayerStats[player.id].gameLog.push(gameStats);
     });
-
+    
     const result = `${won ? 'W' : 'L'} ${score.us}-${score.them} vs ${nextGame.opponent}`;
     const newNotif = { id: Date.now(), type: won ? 'success' : 'warning', text: result, read: false };
-
+    
     // Update ALL schedules
     const newAllSchedules = { ...prev.allSchedules };
-
-    // Update YOUR game with box score
+    
+    // Update YOUR game
     newAllSchedules[prev.team.id] = prev.schedule.map(g => 
-      g.id === nextGame.id ? { 
-        ...g, 
-        played: true, 
-        won, 
-        score,
-        boxScore: {
-          home: nextGame.isHome ? yourBoxScore : oppBoxScore,
-          away: nextGame.isHome ? oppBoxScore : yourBoxScore,
-          homeTeam: nextGame.isHome ? prev.team.abbr : opponent.abbr,
-          awayTeam: nextGame.isHome ? opponent.abbr : prev.team.abbr,
-        }
-      } : g
+      g.id === nextGame.id ? { ...g, played: true, won, score } : g
     );
     
     const newSchedule = newAllSchedules[prev.team.id];
