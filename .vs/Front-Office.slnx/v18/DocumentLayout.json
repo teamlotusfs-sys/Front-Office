@@ -184,9 +184,10 @@
               "RelativeDocumentMoniker": "src\\hooks\\useGameState.js",
               "ToolTip": "C:\\Users\\AdamL\\OneDrive\\Documents\\GitHub\\Front-Office\\src\\hooks\\useGameState.js",
               "RelativeToolTip": "src\\hooks\\useGameState.js",
-              "ViewState": "AgIAAEsAAAAAAAAAAIBJwE4BAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAMABAAAAAAAAAIBJwE4BAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T15:58:44.037Z"
+              "WhenOpened": "2026-04-22T15:58:44.037Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -198,8 +199,7 @@
               "RelativeToolTip": "src\\data\\playerStatsHelpers.js",
               "ViewState": "AgIAACkAAAAAAAAAAIBJwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2026-04-22T15:58:43.993Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-04-22T15:58:43.993Z"
             },
             {
               "$type": "Document",

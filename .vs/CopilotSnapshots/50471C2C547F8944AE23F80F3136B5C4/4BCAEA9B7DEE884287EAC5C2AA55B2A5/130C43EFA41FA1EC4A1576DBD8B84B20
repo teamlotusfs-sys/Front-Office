@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -445,21 +445,20 @@ const simulateGame = useCallback(() => {
     );
     
     const newSchedule = newAllSchedules[prev.team.id];
-
-    // Simulate ALL OTHER games up to current date
-    const currentGameDate = parseDate(nextGame.date);
+    
+    // Simulate OTHER games on SAME DATE
+    const gameDate = nextGame.date;
     NBA_TEAMS.forEach(otherTeam => {
       if (otherTeam.id === prev.team.id) return;
-
+      
       if (!newAllSchedules[otherTeam.id]) {
         newAllSchedules[otherTeam.id] = prev.allSchedules[otherTeam.id] || [];
       }
-
+      
       const teamSchedule = newAllSchedules[otherTeam.id];
-      // Simulate ALL unplayed games up to current date
-      const gamesUpToNow = teamSchedule.filter(g => !g.played && parseDate(g.date) <= currentGameDate);
-
-      gamesUpToNow.forEach(game => {
+      const gamesOnSameDay = teamSchedule.filter(g => g.date === gameDate && !g.played);
+      
+      gamesOnSameDay.forEach(game => {
         const oppTeam = NBA_TEAMS.find(t => t.abbr === game.opponent);
         if (!oppTeam) return;
 
@@ -482,124 +481,23 @@ const simulateGame = useCallback(() => {
         const teamScore = Math.round(teamBaseScore + (random() - 0.5) * 20);
         const oppBaseScore = 100 + ((oppTeamRating - 70) * 0.8);
         const oppScore = Math.round(oppBaseScore + (random() - 0.5) * 20);
-
+        
         const finalTeamScore = teamWon ? Math.max(oppScore + 1, teamScore) : Math.min(oppScore - 1, teamScore);
         const finalOppScore = teamWon ? oppScore : Math.max(finalTeamScore + 1, oppScore);
-
+        
         const teamGameScore = { us: finalTeamScore, them: finalOppScore };
-
-        // Generate box scores for both teams
-        const teamBoxScore = generateTeamBoxScore(teamRoster, finalTeamScore, teamWon);
-        const oppBoxScore = generateTeamBoxScore(oppRoster, finalOppScore, !teamWon);
-
-        // Update player stats for BOTH teams in this game
-        teamBoxScore.forEach(stat => {
-          if (!newPlayerStats[stat.playerId]) {
-            newPlayerStats[stat.playerId] = {
-              gamesPlayed: 0,
-              totalPoints: 0,
-              totalRebounds: 0,
-              totalAssists: 0,
-              totalSteals: 0,
-              totalBlocks: 0,
-              totalFGM: 0,
-              totalFGA: 0,
-              totalTPM: 0,
-              totalTPA: 0,
-              totalFTM: 0,
-              totalFTA: 0,
-              totalTurnovers: 0,
-              gameLog: [],
-            };
-          }
-
-          if (stat.minutes > 0) {
-            newPlayerStats[stat.playerId].gamesPlayed++;
-            newPlayerStats[stat.playerId].totalPoints += stat.points;
-            newPlayerStats[stat.playerId].totalRebounds += stat.rebounds;
-            newPlayerStats[stat.playerId].totalAssists += stat.assists;
-            newPlayerStats[stat.playerId].totalSteals += stat.steals;
-            newPlayerStats[stat.playerId].totalBlocks += stat.blocks;
-            newPlayerStats[stat.playerId].totalFGM += stat.fgm;
-            newPlayerStats[stat.playerId].totalFGA += stat.fga;
-            newPlayerStats[stat.playerId].totalTPM += stat.tpm;
-            newPlayerStats[stat.playerId].totalTPA += stat.tpa;
-            newPlayerStats[stat.playerId].totalFTM += stat.ftm;
-            newPlayerStats[stat.playerId].totalFTA += stat.fta;
-            newPlayerStats[stat.playerId].totalTurnovers += stat.turnovers;
-          }
-        });
-
-        oppBoxScore.forEach(stat => {
-          if (!newPlayerStats[stat.playerId]) {
-            newPlayerStats[stat.playerId] = {
-              gamesPlayed: 0,
-              totalPoints: 0,
-              totalRebounds: 0,
-              totalAssists: 0,
-              totalSteals: 0,
-              totalBlocks: 0,
-              totalFGM: 0,
-              totalFGA: 0,
-              totalTPM: 0,
-              totalTPA: 0,
-              totalFTM: 0,
-              totalFTA: 0,
-              totalTurnovers: 0,
-              gameLog: [],
-            };
-          }
-
-          if (stat.minutes > 0) {
-            newPlayerStats[stat.playerId].gamesPlayed++;
-            newPlayerStats[stat.playerId].totalPoints += stat.points;
-            newPlayerStats[stat.playerId].totalRebounds += stat.rebounds;
-            newPlayerStats[stat.playerId].totalAssists += stat.assists;
-            newPlayerStats[stat.playerId].totalSteals += stat.steals;
-            newPlayerStats[stat.playerId].totalBlocks += stat.blocks;
-            newPlayerStats[stat.playerId].totalFGM += stat.fgm;
-            newPlayerStats[stat.playerId].totalFGA += stat.fga;
-            newPlayerStats[stat.playerId].totalTPM += stat.tpm;
-            newPlayerStats[stat.playerId].totalTPA += stat.tpa;
-            newPlayerStats[stat.playerId].totalFTM += stat.ftm;
-            newPlayerStats[stat.playerId].totalFTA += stat.fta;
-            newPlayerStats[stat.playerId].totalTurnovers += stat.turnovers;
-          }
-        });
-
-        // Update both teams' schedules with box scores
+        
+        // Update both teams' schedules
         newAllSchedules[otherTeam.id] = teamSchedule.map(g => 
-          g.id === game.id ? { 
-            ...g, 
-            played: true, 
-            won: teamWon, 
-            score: teamGameScore,
-            boxScore: {
-              home: game.isHome ? teamBoxScore : oppBoxScore,
-              away: game.isHome ? oppBoxScore : teamBoxScore,
-              homeTeam: game.isHome ? otherTeam.abbr : oppTeam.abbr,
-              awayTeam: game.isHome ? oppTeam.abbr : otherTeam.abbr,
-            }
-          } : g
+          g.id === game.id ? { ...g, played: true, won: teamWon, score: teamGameScore } : g
         );
-
+        
         // Update opponent's schedule too
         const oppSchedule = newAllSchedules[oppTeam.id] || prev.allSchedules[oppTeam.id] || [];
-        const oppGame = oppSchedule.find(g => g.date === game.date && g.opponent === otherTeam.abbr && !g.played);
+        const oppGame = oppSchedule.find(g => g.date === gameDate && g.opponent === otherTeam.abbr && !g.played);
         if (oppGame) {
           newAllSchedules[oppTeam.id] = oppSchedule.map(g =>
-            g.id === oppGame.id ? { 
-              ...g, 
-              played: true, 
-              won: !teamWon, 
-              score: { us: finalOppScore, them: finalTeamScore },
-              boxScore: {
-                home: oppGame.isHome ? oppBoxScore : teamBoxScore,
-                away: oppGame.isHome ? teamBoxScore : oppBoxScore,
-                homeTeam: oppGame.isHome ? oppTeam.abbr : otherTeam.abbr,
-                awayTeam: oppGame.isHome ? otherTeam.abbr : oppTeam.abbr,
-              }
-            } : g
+            g.id === oppGame.id ? { ...g, played: true, won: !teamWon, score: { us: finalOppScore, them: finalTeamScore } } : g
           );
         }
       });
