@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateLeagueSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -493,9 +493,10 @@ const simulateGame = useCallback(() => {
           newPlayerStats[stat.playerId].totalFTA += stat.fta;
           newPlayerStats[stat.playerId].totalTurnovers += stat.turnovers;
 
-          // Determine opponent based on whether player is in home or away box score
-          const isHomePlayer = homeBoxScore.some(p => p.playerId === stat.playerId);
-          const opponentAbbr = isHomePlayer ? awayTeam.abbr : homeTeam.abbr;
+          // Add to game log
+          const opponentAbbr = stat.playerId.toString().startsWith(game.homeTeam.toString()) 
+            ? awayTeam.abbr 
+            : homeTeam.abbr;
 
           newPlayerStats[stat.playerId].gameLog.push({
             date: game.date,
@@ -578,24 +579,24 @@ const simulateGame = useCallback(() => {
       const yourPlayers = trade.yourPlayers;
       const theirPlayers = trade.theirPlayers;
       const theirTeam = trade.from;
-
+      
       let newRoster = prev.roster.filter(p => !yourPlayers.find(tp => tp.id === p.id));
       newRoster = [...newRoster, ...theirPlayers.map(p => ({ ...p, teamId: prev.team.id }))];
-
+      
       const newBudget = calculateAvailableCap(newRoster);
       if (newBudget < 0) {
         return { ...prev, notifications: [{ id: Date.now(), type: 'warning', text: 'Trade exceeds cap!', read: false }, ...prev.notifications] };
       }
-
+      
       const newAllRosters = { ...prev.allRosters };
       newAllRosters[prev.team.id] = newRoster;
       newAllRosters[theirTeam.id] = prev.allRosters[theirTeam.id]
         .filter(p => !theirPlayers.find(tp => tp.id === p.id))
         .concat(yourPlayers.map(p => ({ ...p, teamId: theirTeam.id })));
-
+      
       const tradeDescription = `Traded ${trade.yourPlayers.map(p => p.lastName).join(', ')} for ${trade.theirPlayers.map(p => p.lastName).join(', ')} with ${theirTeam.abbr}`;
       const newNotif = { id: Date.now(), type: 'success', text: tradeDescription, read: false };
-
+      
       return {
         ...prev,
         roster: newRoster,

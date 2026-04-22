@@ -1,4 +1,4 @@
-export const NBA_TEAMS = [
+﻿export const NBA_TEAMS = [
   { id: 'ATL', name: 'Atlanta Hawks', city: 'Atlanta', abbr: 'ATL', conf: 'East', div: 'Southeast', color: '#E03A3E', rating: 74, emoji: '🦅' },
   { id: 'BOS', name: 'Boston Celtics', city: 'Boston', abbr: 'BOS', conf: 'East', div: 'Atlantic', color: '#007A33', rating: 92, emoji: '☘️' },
   { id: 'BKN', name: 'Brooklyn Nets', city: 'Brooklyn', abbr: 'BKN', conf: 'East', div: 'Atlantic', color: '#000000', rating: 70, emoji: '🕸️' },
@@ -130,184 +130,42 @@ export function generateRoster(teamId, size = 15) {
   return Array.from({ length: size }, () => generatePlayer(teamId));
 }
 
-// Generate master league schedule - ONE schedule for entire league
-export function generateLeagueSchedule() {
-  const leagueGames = [];
-  let gameId = 1;
-
-  // Create matchup matrix - each team plays every other team
-  const matchups = [];
-  NBA_TEAMS.forEach((team, i) => {
-    NBA_TEAMS.forEach((opponent, j) => {
-      if (i < j) { // Avoid duplicates
-        // Each team plays every other team 3-4 times (total 82 games per team)
-        // Division rivals: 4 games, Conference: 3-4 games, Other conference: 2 games
-        const isDivisionRival = team.div === opponent.div;
-        const isConference = team.conf === opponent.conf;
-
-        let numGames;
-        if (isDivisionRival) {
-          numGames = 4; // Play division rivals 4 times
-        } else if (isConference) {
-          numGames = random() > 0.5 ? 4 : 3; // Conference teams 3-4 times
-        } else {
-          numGames = 2; // Other conference 2 times
-        }
-
-        for (let g = 0; g < numGames; g++) {
-          // Alternate home/away
-          const homeTeam = g % 2 === 0 ? team : opponent;
-          const awayTeam = g % 2 === 0 ? opponent : team;
-
-          matchups.push({ homeTeam, awayTeam });
-        }
-      }
-    });
-  });
-
-  // Shuffle matchups for randomness
-  for (let i = matchups.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [matchups[i], matchups[j]] = [matchups[j], matchups[i]];
-  }
-
-  // Distribute games across season calendar
-  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-  const daysPerMonth = [31, 30, 31, 31, 28, 31, 30];
-  const seasonDates = [];
-
-  // Create season calendar (Oct 15 - Apr 15, roughly 180 days)
-  months.forEach((month, monthIdx) => {
-    const daysInMonth = daysPerMonth[monthIdx];
-    const startDay = monthIdx === 0 ? 15 : 1; // Start Oct 15
-    const endDay = monthIdx === months.length - 1 ? 15 : daysInMonth; // End Apr 15
-
-    for (let day = startDay; day <= endDay; day++) {
-      // Skip some days for realistic spacing (not every day has games)
-      if (random() > 0.25) { // ~75% of days have games
-        seasonDates.push(`${month} ${day}`);
-      }
-    }
-  });
-
-  // Track games per team to balance schedule
-  const teamGameCount = {};
-  NBA_TEAMS.forEach(t => { teamGameCount[t.id] = 0; });
-
-  // Assign matchups to dates
-  let dateIdx = 0;
-  matchups.forEach(matchup => {
-    // Find next available date where both teams can play
-    let assigned = false;
-    let attempts = 0;
-
-    while (!assigned && attempts < 100) {
-      const date = seasonDates[dateIdx % seasonDates.length];
-
-      // Check if either team already has a game on this date
-      const homeHasGame = leagueGames.some(g => 
-        g.date === date && (g.homeTeam === matchup.homeTeam.id || g.awayTeam === matchup.homeTeam.id)
-      );
-      const awayHasGame = leagueGames.some(g => 
-        g.date === date && (g.homeTeam === matchup.awayTeam.id || g.awayTeam === matchup.awayTeam.id)
-      );
-
-      if (!homeHasGame && !awayHasGame) {
-        leagueGames.push({
-          id: `game_${gameId++}`,
-          date: date,
-          homeTeam: matchup.homeTeam.id,
-          awayTeam: matchup.awayTeam.id,
-          played: false,
-          homeScore: null,
-          awayScore: null,
-          winner: null,
-          boxScore: null,
-        });
-
-        teamGameCount[matchup.homeTeam.id]++;
-        teamGameCount[matchup.awayTeam.id]++;
-        assigned = true;
-      }
-
-      dateIdx++;
-      attempts++;
-    }
-
-    // Fallback: force assign to next date if we couldn't find a slot
-    if (!assigned) {
-      const date = seasonDates[dateIdx % seasonDates.length];
-      leagueGames.push({
-        id: `game_${gameId++}`,
-        date: date,
-        homeTeam: matchup.homeTeam.id,
-        awayTeam: matchup.awayTeam.id,
-        played: false,
-        homeScore: null,
-        awayScore: null,
-        winner: null,
-        boxScore: null,
-      });
-      teamGameCount[matchup.homeTeam.id]++;
-      teamGameCount[matchup.awayTeam.id]++;
-      dateIdx++;
-    }
-  });
-
-  // Sort by date
-  leagueGames.sort((a, b) => {
-    const aDate = parseScheduleDate(a.date);
-    const bDate = parseScheduleDate(b.date);
-    return aDate - bDate;
-  });
-
-  return leagueGames;
-}
-
-// Helper to parse date strings for sorting
-function parseScheduleDate(dateStr) {
-  const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
-  const [month, day] = dateStr.split(' ');
-  const monthIndex = months.indexOf(month);
-  return monthIndex * 100 + parseInt(day);
-}
-
-// Legacy function for backward compatibility - now creates view from master schedule
 export function generateSchedule(teamId) {
-  // This is deprecated but kept for compatibility
-  // The real schedule is now generated via generateLeagueSchedule()
   const opponents = NBA_TEAMS.filter(t => t.id !== teamId);
   let gameId = 1;
   const games = [];
   const schedule = [];
-
+  
+  // Create exactly 82 games
   opponents.forEach(opp => {
     schedule.push({ opponent: opp, isHome: true });
     schedule.push({ opponent: opp, isHome: false });
   });
-
+  
+  // We have 58 games (29 * 2), need 82. Add 24 more (some teams 3x)
   const extraGames = 82 - schedule.length;
   for (let i = 0; i < extraGames; i++) {
     const opp = opponents[Math.floor(random() * opponents.length)];
     schedule.push({ opponent: opp, isHome: random() > 0.5 });
   }
-
+  
+  // Shuffle
   for (let i = schedule.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
     [schedule[i], schedule[j]] = [schedule[j], schedule[i]];
   }
-
+  
   const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
   const daysPerMonth = [31, 30, 31, 31, 28, 31, 30];
-
+  
   schedule.forEach((s, idx) => {
     const gamesPerMonth = Math.ceil(82 / 7);
     const monthIndex = Math.floor(idx / gamesPerMonth);
     const dayInMonth = ((idx % gamesPerMonth) + 1) * 2;
-
+    
     const actualMonth = Math.min(monthIndex, 6);
     const actualDay = Math.min(dayInMonth, daysPerMonth[actualMonth]);
-
+    
     games.push({
       id: gameId++,
       opponent: s.opponent.abbr,
@@ -321,7 +179,7 @@ export function generateSchedule(teamId) {
       score: null,
     });
   });
-
+  
   return games;
 }
 

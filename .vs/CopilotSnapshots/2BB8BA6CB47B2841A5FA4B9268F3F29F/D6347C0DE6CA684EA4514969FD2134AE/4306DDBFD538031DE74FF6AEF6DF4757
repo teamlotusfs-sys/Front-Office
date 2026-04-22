@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+﻿import React, { createContext, useContext, useState, useCallback } from 'react';
 import { NBA_TEAMS, generateRoster, generateLeagueSchedule, generateDraftPicks, generateFreeAgents } from '../data/nbaData';
 import { generateTeamBoxScore } from '../data/playerStatsHelpers';
 
@@ -493,9 +493,10 @@ const simulateGame = useCallback(() => {
           newPlayerStats[stat.playerId].totalFTA += stat.fta;
           newPlayerStats[stat.playerId].totalTurnovers += stat.turnovers;
 
-          // Determine opponent based on whether player is in home or away box score
-          const isHomePlayer = homeBoxScore.some(p => p.playerId === stat.playerId);
-          const opponentAbbr = isHomePlayer ? awayTeam.abbr : homeTeam.abbr;
+          // Add to game log
+          const opponentAbbr = stat.playerId.toString().startsWith(game.homeTeam.toString()) 
+            ? awayTeam.abbr 
+            : homeTeam.abbr;
 
           newPlayerStats[stat.playerId].gameLog.push({
             date: game.date,

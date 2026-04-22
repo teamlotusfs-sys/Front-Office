@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useGame } from '../hooks/useGameState';
 import { NBA_TEAMS } from '../data/nbaData';
 import './Standings.css';
@@ -11,18 +11,18 @@ export default function Standings() {
     return <div className="page-title">Loading...</div>;
   }
 
-  const { team, teamSchedules } = gameState;
+  const { team, allSchedules } = gameState;
 
-  // Calculate records from teamSchedules (derived from master schedule)
+  // Calculate records from allSchedules (not teamRecords)
   const teamRecords = {};
   NBA_TEAMS.forEach(t => {
     teamRecords[t.id] = { w: 0, l: 0, pf: 0, pa: 0 };
   });
 
-  // Count played games from team schedules
+  // Count played games from ALL teams' schedules
   NBA_TEAMS.forEach(t => {
-    if (teamSchedules[t.id]) {
-      teamSchedules[t.id].forEach(g => {
+    if (allSchedules[t.id]) {
+      allSchedules[t.id].forEach(g => {
         if (g.played) {
           if (g.won) {
             teamRecords[t.id].w++;

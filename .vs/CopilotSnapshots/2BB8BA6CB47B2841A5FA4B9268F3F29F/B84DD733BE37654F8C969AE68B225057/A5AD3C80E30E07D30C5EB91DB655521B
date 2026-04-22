@@ -1,4 +1,4 @@
-export const NBA_TEAMS = [
+﻿export const NBA_TEAMS = [
   { id: 'ATL', name: 'Atlanta Hawks', city: 'Atlanta', abbr: 'ATL', conf: 'East', div: 'Southeast', color: '#E03A3E', rating: 74, emoji: '🦅' },
   { id: 'BOS', name: 'Boston Celtics', city: 'Boston', abbr: 'BOS', conf: 'East', div: 'Atlantic', color: '#007A33', rating: 92, emoji: '☘️' },
   { id: 'BKN', name: 'Brooklyn Nets', city: 'Brooklyn', abbr: 'BKN', conf: 'East', div: 'Atlantic', color: '#000000', rating: 70, emoji: '🕸️' },
