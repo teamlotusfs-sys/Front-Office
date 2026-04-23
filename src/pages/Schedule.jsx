@@ -4,13 +4,13 @@ import GameSimAnimation from '../components/GameSimAnimation';
 import BoxScore from '../components/BoxScore';
 import './Schedule.css';
 
+// Define months as a constant outside component to prevent re-creation
+const MONTHS = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+
 export default function Schedule() {
   const { gameState, gameAnimation, simulateGame } = useGame();
   const [selectedGame, setSelectedGame] = useState(null);
   const [currentMonth, setCurrentMonth] = useState('Oct');
-
-  // Wrap months in useMemo to prevent reference changes
-  const months = useMemo(() => ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'], []);
 
   // Get schedule early (memoized to prevent dependency issues)
   const schedule = useMemo(() => gameState?.schedule || [], [gameState]);
@@ -38,11 +38,11 @@ export default function Schedule() {
 
   // Group games by month
   const gamesByMonth = useMemo(() => 
-    months.reduce((acc, month) => {
+    MONTHS.reduce((acc, month) => {
       acc[month] = schedule.filter(g => g.date && g.date.startsWith(month));
       return acc;
     }, {}),
-    [schedule, months]
+    [schedule]
   );
 
   const currentMonthGames = gamesByMonth[currentMonth] || [];
@@ -112,7 +112,7 @@ export default function Schedule() {
 
       {/* Month Navigation */}
       <div className="month-nav">
-        {months.map(month => {
+        {MONTHS.map(month => {
           const monthGames = gamesByMonth[month] || [];
           const monthRecord = {
             w: monthGames.filter(g => g.played && g.won).length,
